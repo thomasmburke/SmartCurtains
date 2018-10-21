@@ -36,8 +36,10 @@ payload = {
 
 
 myMQTTClient.connect()
-myMQTTClient.publish(topic="raspberrypi", payload=json.dumps(payload),QoS=0)
-myMQTTClient.subscribe(topic="raspberrypi", QoS=0, callback=customCallback)
-myMQTTClient.publish(topic="raspberrypi", payload=json.dumps(payload),QoS=0)
+myMQTTClient.publish(topic="raspberrypi333", payload=json.dumps(payload),QoS=0)
+myMQTTClient.subscribe(topic="raspberrypi3", QoS=0, callback=customCallback)
+while True:
+    myMQTTClient.publish(topic="raspberrypi3", payload=json.dumps(payload),QoS=0)
+    sleep(4)
 #myMQTTClient.unsubscribe(topic="myTopic")
 myMQTTClient.disconnect()
