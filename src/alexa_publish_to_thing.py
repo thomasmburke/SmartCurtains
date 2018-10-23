@@ -1,6 +1,9 @@
 import json
 import boto3
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def alexa_publish_to_thing(event, context):
     """
@@ -10,12 +13,18 @@ def alexa_publish_to_thing(event, context):
     Request are handled by functions such as on_launch(event) and
     intent_scheme(event).
     """
+    logger.info('got event: '.format(event))
     # Initialize iot client to publish messages to a IoT thing
+    logger.info('connecting to iot-data module...')
     client = boto3.client('iot-data', region_name='us-east-1')
+    # Set MQTT variables
+    topic = 'raspberrypi3'
+    QoS = 1
     # Publish a MQTT message to a topic for our thing to ingest
+    logger.info('publishing MQTT message to topic: {}'.format(topic))
     response = client.publish(
-        topic='raspberrypi3',#'$aws/things/pi/shadow/update',
-        qos=1,
+        topic=topic,#'$aws/things/pi/shadow/update',
+        qos=QoS,
         payload=json.dumps({'foo':'bar'})
     )
     if event['session']['new']:
@@ -30,7 +39,8 @@ def alexa_publish_to_thing(event, context):
 
 # Here we define the Request handler functions
 def on_start():
-    print("Session Started.")
+    # Not sure if this will be a useful function will determine later...
+    logger.info('Session Started.')
 
 def on_launch(event):
     onlunch_MSG = "Hi, welcome to the Tom Burke alexa skill"
