@@ -10,7 +10,9 @@ def alexa_publish_to_thing(event, context):
     Request are handled by functions such as on_launch(event) and
     intent_scheme(event).
     """
+    # Initialize iot client to publish messages to a IoT thing
     client = boto3.client('iot-data', region_name='us-east-1')
+    # Publish a MQTT message to a topic for our thing to ingest
     response = client.publish(
         topic='raspberrypi3',#'$aws/things/pi/shadow/update',
         qos=1,

@@ -1,0 +1,12 @@
+Register a thing
+create a certificate and  copy that along with public and private keys to the pi
+On Pi > sudo pip3 install --upgrade awscli
+on Mac > scp deviceSDK pi@10.0.0.89:~ #this copies the cert and keys
+create a policy to attach to the certificate (this give permission to other things to interact with the iot device)
+action = iot:*
+resource ARN = *
+click on thing->interact and take down the HTTP REST endpoint:
+a1m9l7b2p68rpy-ats.iot.us-east-1.amazonaws.com   This can be used to update a thing's shadow
+Security-> attach policy to certificate 
+on pi > pip install AWSIoTPythonSDK
+
