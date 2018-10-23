@@ -49,7 +49,7 @@ def on_end():
     logging.info('Session Ended.')
 
 def intent_scheme(event):
-"""
+    """
     Description: The intent_scheme(event) function handles the Intent Request. 
     Since we have a few different intents in our skill, we need to 
     configure what this function will do upon receiving a particular 
@@ -59,7 +59,7 @@ def intent_scheme(event):
     Params: event - a JSON passed by alexa
 
     Return: function - probably will change this...
-"""
+    """
     # Create function dictionary based on intent name
     intentFunc ={
             'GPIOControl': gpio_control,
