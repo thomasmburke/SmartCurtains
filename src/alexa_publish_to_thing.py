@@ -2,6 +2,9 @@ import json
 import boto3
 import logging
 
+#TODO: Turn into a skill_handler class
+
+# Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -22,13 +25,11 @@ def alexa_publish_to_thing(event, context):
     QoS = 1
     # Publish a MQTT message to a topic for our thing to ingest
     logger.info('publishing MQTT message to topic: {}'.format(topic))
-    response = client.publish(
+    client.publish(
         topic=topic,#'$aws/things/pi/shadow/update',
         qos=QoS,
         payload=json.dumps({'foo':'bar'})
     )
-    if event['session']['new']:
-        on_start()
     if event['request']['type'] == 'LaunchRequest':
         return on_launch(event)
     elif event['request']['type'] == 'IntentRequest':
@@ -37,44 +38,46 @@ def alexa_publish_to_thing(event, context):
         return on_end()
 
 
-# Here we define the Request handler functions
-def on_start():
-    # Not sure if this will be a useful function will determine later...
-    logger.info('Session Started.')
-
 def on_launch(event):
-    onlunch_MSG = "Hi, welcome to the Tom Burke alexa skill"
+    onlunch_MSG = "Hi, welcome to the raspberry pi alexa skill"
     reprompt_MSG = "Please supply an appropriate pi command?"
     card_TEXT = "Pick pin and status."
     card_TITLE = "Choose a pin and status."
     return output_json_builder_with_reprompt_and_card(onlunch_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
 
 def on_end():
-    print("Session Ended.")
+    logging.info('Session Ended.')
 
+def intent_scheme(event):
 """
-    The intent_scheme(event) function handles the Intent Request. 
+    Description: The intent_scheme(event) function handles the Intent Request. 
     Since we have a few different intents in our skill, we need to 
     configure what this function will do upon receiving a particular 
     intent. This can be done by introducing the functions which handle 
     each of the intents.
+
+    Params: event - a JSON passed by alexa
+
+    Return: function - probably will change this...
 """
-def intent_scheme(event):
-    
-    intent_name = event['request']['intent']['name']
-    return player_bio(event)
-    #if intent_name == "playerBio":
-    #    return player_bio(event)        
-    #elif intent_name in ["AMAZON.NoIntent", "AMAZON.StopIntent", "AMAZON.CancelIntent"]:
-    #    return stop_the_skill(event)
-    #elif intent_name == "AMAZON.HelpIntent":
-    #    return assistance(event)
-    #elif intent_name == "AMAZON.FallbackIntent":
-    #    return fallback_call(event)
+    # Create function dictionary based on intent name
+    intentFunc ={
+            'GPIOControl': gpio_control,
+            'AMAZON.StopIntent': stop,
+            'AMAZON.CancelIntent': stop,
+            'AMAZON.HelpIntent': assistance,
+            'AMAZON.FallbackIntent': fallback
+            }
+    # Gather the name of the intent sent from alexa
+    intentName = event['request']['intent']['name'] 
+    if intentName in intentFunc:
+        return intentFunc[intentName](event)
+    else:
+        return stop(event) 
 
 
 # Here we define the intent handler functions
-def player_bio(event):
+def gpio_control(event):
     #name=event['request']['intent']['slots']['player']['value']
     #player_list_lower=[w.lower() for w in Player_LIST]
     #if name.lower() in player_list_lower:
@@ -94,7 +97,7 @@ def player_bio(event):
     return output_json_builder_with_reprompt_and_card("The pin is up dude", card_TEXT, card_TITLE, reprompt_MSG, False)
         
         
-def stop_the_skill(event):
+def stop(event):
     stop_MSG = "Thank you. Bye!"
     reprompt_MSG = ""
     card_TEXT = "Bye."
@@ -110,7 +113,7 @@ def assistance(event):
     card_TITLE = "Help"
     return output_json_builder_with_reprompt_and_card(assistance_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
 
-def fallback_call(event):
+def fallback(event):
     fallback_MSG = "I can't help you with that, try rephrasing the question or ask for help by saying HELP."
     reprompt_MSG = "Do you want to hear more about a pin"#particular player?"
     card_TEXT = "You've asked a wrong question."
