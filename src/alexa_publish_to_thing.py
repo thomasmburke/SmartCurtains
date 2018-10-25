@@ -30,23 +30,25 @@ def alexa_publish_to_thing(event, context):
         qos=QoS,
         payload=json.dumps({'foo':'bar'})
     )
-    if event['request']['type'] == 'LaunchRequest':
-        return on_launch(event)
-    elif event['request']['type'] == 'IntentRequest':
-        return intent_scheme(event)
-    elif event['request']['type'] == 'SessionEndedRequest':
-        return on_end()
+    # Gather request type and kick off appropriate function
+    requestType = event['request']['type']
+    requestTypeFunc = {
+            'LaunchRequest': on_launch,
+            'IntentRequest': intent_scheme,
+            }
+    if requestType in requestTypeFunc:
+        requestTypeFunc[requestType](event)
+    else:
+        logging.info('Session Ended.')
 
 
 def on_launch(event):
-    onlunch_MSG = "Hi, welcome to the raspberry pi alexa skill"
-    reprompt_MSG = "Please supply an appropriate pi command?"
-    card_TEXT = "Pick pin and status."
-    card_TITLE = "Choose a pin and status."
-    return output_json_builder_with_reprompt_and_card(onlunch_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
+    launchMessage = "Hi, welcome to the raspberry pi alexa skill"
+    repromptMessage = "Please supply an appropriate pi command?"
+    cardText = "Pick pin and status."
+    cardTitle = "Choose a pin and status."
+    return output_json_builder_with_reprompt_and_card(launchMessage, cardText, cardTitle, repromptMessage, False)
 
-def on_end():
-    logging.info('Session Ended.')
 
 def intent_scheme(event):
     """
@@ -78,23 +80,20 @@ def intent_scheme(event):
 
 # Here we define the intent handler functions
 def gpio_control(event):
-    #name=event['request']['intent']['slots']['player']['value']
-    #player_list_lower=[w.lower() for w in Player_LIST]
-    #if name.lower() in player_list_lower:
-    #    reprompt_MSG = "Do you want to hear more about a particular player?"
-    #    card_TEXT = "You've picked " + name.lower()
-    #    card_TITLE = "You've picked " + name.lower()
-    #    return output_json_builder_with_reprompt_and_card(Player_BIOGRAPHY[name.lower()], card_TEXT, card_TITLE, reprompt_MSG, False)
-    #else:
-    #    wrongname_MSG = "You haven't used the full name of a player. If you have forgotten which players you can pick say Help."
-    #    reprompt_MSG = "Do you want to hear more about a particular player?"
-    #    card_TEXT = "Use the full name."
-    #    card_TITLE = "Wrong name."
-    #    return output_json_builder_with_reprompt_and_card(wrongname_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
-    reprompt_MSG = "Do you want to change the pin status of another pin?"
-    card_TEXT = "You've got to an intent field"
-    card_TITLE = "You've got to an intent field"
-    return output_json_builder_with_reprompt_and_card("The pin is up dude", card_TEXT, card_TITLE, reprompt_MSG, False)
+    curtainCmds = ['open','close','shut']
+    event['request']['intent']['slots']['status']['value']
+    if curtainCmd in curtainCmds:
+        confirmationMessage = 'You have chosen to {} the curtain'.format(curtainCmd)
+        repromptMessage = 'Do you want to adjust the curtain setting again?'
+        cardText = confirmationMessage
+        cardTitle = confirmationMessage
+        return output_json_builder_with_reprompt_and_card(confirmationMessage, cardText, cardTitle, repromptMessage, False)
+    else:
+        invalidCmd = 'The command you have supplied to the curtain is not supported'
+        repromptMessage = 'Do you want to perform an action on the curtains?'
+        cardText = 'Use a proper curtain command.'
+        cardTitle = 'Invalid curtain command.'
+        return output_json_builder_with_reprompt_and_card(invalidCmd, cardText, cardTitle, repromptMessage, False)
         
         
 def stop(event):
