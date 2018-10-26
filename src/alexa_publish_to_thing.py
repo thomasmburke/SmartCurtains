@@ -171,7 +171,7 @@ def fallback(event):
 
     Return: TBD
     """
-    logger.info('fallback method was called due to unexpected utterance after
+    logger.info('fallback method was called due to unexpected utterance after \
             hearing the invocation name')
     fallbackMessage = 'I can not help you with that, try rephrasing the question or ask for help by saying HELP.'
     repromptMessage = 'Do you want to perform another curtain command?'
