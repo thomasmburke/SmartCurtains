@@ -36,8 +36,12 @@ class SkillHandler:
         self.event = event
         self.requestType = event['request']['type']
         self.curtainCmds = ['open', 'close', 'shut']
-        self.intentName = responseConfig['skillNames'][event['session']['application']['applicationId']]
-        self.intentResponse = responseConfig[self.intentName]
+        try:
+            self.skillName = responseConfig['skillNames'][event['session']['application']['applicationId']]
+        except:
+            logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
+            self.skillName = 'GPIOControl'
+        self.intentResponse = responseConfig[self.skillName]
 
     def handle_skill(self):
         """
@@ -114,9 +118,10 @@ class SkillHandler:
                 'AMAZON.FallbackIntent': self.fallback
                 }
         # Gather the name of the intent sent from alexa
-        logger.info('Received the following intent: {}'.format(self.intentName))
-        if self.intentName in intentFunc:
-            return intentFunc[self.intentName](event)
+        intentName = event['request']['intent']['name']
+        logger.info('Received the following intent: {}'.format(intentName))
+        if intentName in intentFunc:
+            return intentFunc[intentName](event)
         else:
             return self.stop(event) 
 
