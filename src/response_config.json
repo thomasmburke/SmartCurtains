@@ -1,5 +1,5 @@
 {
-"curtainResponses": {
+"GPIOControl": {
     "launchResponse": {
         "outputSpeech": "Hi, welcome to the raspberry pi alexa skill",
         "repromptMessage": "Please supply an appropriate pi command",
@@ -42,5 +42,8 @@
         "cardTitle": "Invalid curtain command",
         "endSession": true
     }
-}    
+},
+"skillNames": {
+    "amzn1.ask.skill.f0e6380a-50e1-4ffb-bdfc-b97f5e6949f4": "GPIOControl"
+}
 }

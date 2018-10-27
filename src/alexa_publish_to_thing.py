@@ -3,7 +3,7 @@ import boto3
 import logging
 
 # TODO: get rid of remprompt where endSession is true (in json)
-# TODO: make SkillHandler a virtual class and Curtain child class
+# TODO: make SkillHandler a virtual class and Curtain child class (maybe not..)
 
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
@@ -16,7 +16,10 @@ def alexa_publish_to_thing(event, context):
     SkillHandler class to interpret a request from alexa and return the 
     appropriate response
     """
-    return SkillHandler(event=event).handle_skill()
+    # Gather response config
+    with open('response_config.json') as f:
+        responseConfig = json.load(f)
+    return SkillHandler(event=event, responseConfig=responseConfig).handle_skill()
 
 
 class SkillHandler:
@@ -29,12 +32,12 @@ class SkillHandler:
     Params: DICT event - a JSON request from an alexa custom skill detailing
     an action/response to be taken
     """
-    def __init__(self, event):
+    def __init__(self, event, responseConfig):
         self.event = event
         self.requestType = event['request']['type']
         self.curtainCmds = ['open', 'close', 'shut']
-        with open('response_config.json') as f:
-           self.response = json.load(f)
+        self.intentName = responseConfig['skillNames'][event['session']['application']['applicationId']]
+        self.intentResponse = responseConfig[self.intentName]
 
     def handle_skill(self):
         """
@@ -79,7 +82,6 @@ class SkillHandler:
             payload=json.dumps({'foo': 'bar'})
         )
 
-
     def launch_handler(self, event):
         """
         Description: Given a user calls the Invocation name with no command,
@@ -89,12 +91,7 @@ class SkillHandler:
 
         Return: TBD
         """
-        launchMessage = "Hi, welcome to the raspberry pi alexa skill"
-        repromptMessage = "Please supply an appropriate pi command?"
-        cardText = "Pick pin and status."
-        cardTitle = "Choose a pin and status."
-        return self.build_response(outputSpeech=launchMessage, cardText=cardText,
-                cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=False)
+        return self.build_response(response=self.intentResponse['launchResponse'])
 
     def intent_handler(self, event):
         """
@@ -117,10 +114,9 @@ class SkillHandler:
                 'AMAZON.FallbackIntent': self.fallback
                 }
         # Gather the name of the intent sent from alexa
-        intentName = event['request']['intent']['name']
-        logger.info('Received the following intent: {}'.format(intentName))
-        if intentName in intentFunc:
-            return intentFunc[intentName](event)
+        logger.info('Received the following intent: {}'.format(self.intentName))
+        if self.intentName in intentFunc:
+            return intentFunc[self.intentName](event)
         else:
             return self.stop(event) 
 
@@ -136,27 +132,22 @@ class SkillHandler:
         Return: TBD
         """
         # TODO: see if we can call alexa for appropriate slot values / store in dynamodb
-        # TODO: this list should be stored in skill_handler __init__
         # Retrieve the curtain command supplied by the end user
         curtainCmd = event['request']['intent']['slots']['status']['value']
         # Check to see if user supplied curtain command is in valid command list
         if curtainCmd in self.curtainCmds:
             logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
-            confirmationMessage = 'You have chosen to {} the curtain'.format(curtainCmd)
-            repromptMessage = 'Do you want to adjust the curtain setting again?'
-            cardText = confirmationMessage
-            cardTitle = confirmationMessage
-            return self.build_response(outputSpeech=confirmationMessage, cardText=cardText,
-                    cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=True)
+            curtainResponse = self.intentResponse['validIntentResponse']
+            for k, v in curtainResponse.items():
+                curtainResponse[k] = v.format(curtainCmd) if isinstance(v,str) else v
+            return self.build_response(response=curtainResponse)
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
-            invalidCmd = '{} is a curtain command not supported by the raspberry pi'.format(curtainCmd)
-            repromptMessage = 'Do you want to perform an action on the curtains?'
-            cardText = '{} is a curtain command not supported by the raspberry pi'.format(curtainCmd)
-            cardTitle = 'Invalid curtain command.'
-            return self.build_response(outputSpeech=invalidCmd, cardText=cardText,
-                    cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=True)
-            
+            curtainResponse = self.intentResponse['invalidIntentResponse']
+            for k, v in curtainResponse.items():
+                curtainResponse[k] = v.format(curtainCmd)
+            return self.build_response(response=curtainResponse)
+
     def stop(self, event):
         """
         Description: Used to build exit response for alexa skill.
@@ -166,12 +157,7 @@ class SkillHandler:
         Return: TBD
         """
         logger.info('stopping alexa skill...')
-        stopMessage = 'Thank you. Bye!'
-        repromptMessage = ''
-        cardText = 'Bye.'
-        cardTitle = 'Bye Bye.'
-        return self.build_response(outputSpeech=stopMessage, cardText=cardText,
-                cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=True)
+        return self.build_response(response=self.intentResponse['stopResponse'])
         
     def assistance(self, event):
         """
@@ -182,14 +168,11 @@ class SkillHandler:
 
         Return: TBD
         """
-        #assistanceMessage = "You can choose among these players: " + ', '.join(map(str, Player_LIST)) + ". Be sure to use the full name when asking about the player."
         logger.info('assistance method was called due to user saying HELP')
-        assistanceMessage = 'You can choose among these curtain commands: {}'.format(','.join(map(str, self.curtainCmds)))
-        repromptMessage = 'Do you want to perform another curtain comand?'
-        cardText = 'You have asked for help.'
-        cardTitle = 'Help'
-        return self.build_response(outputSpeech=assistanceMessage, cardText=cardText,
-                cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=False)
+        assistanceResponse = self.intentResponse['assistanceResponse']
+        for k, v in assistanceResponse.items():
+            assistanceResponse[k] = v.format(','.join(map(str, self.curtainCmds))) if isinstance(v, str) else v
+        return self.build_response(response=assistanceResponse)
 
     def fallback(self, event):
         """
@@ -202,14 +185,9 @@ class SkillHandler:
         """
         logger.info('fallback method was called due to unexpected utterance after \
                 hearing the invocation name')
-        fallbackMessage = 'I can not help you with that, try rephrasing the question or ask for help by saying HELP.'
-        repromptMessage = 'Do you want to perform another curtain command?'
-        cardText = 'You have asked a wrong question.'
-        cardTitle = 'Wrong question.'
-        return self.build_response(outputSpeech=fallbackMessage, cardText=cardText,
-                cardTitle=cardTitle, repromptMessage=repromptMessage, endSession=False)
+        return self.build_response(response=self.intentResponse['fallbackResponse'])
 
-    def build_response(self, outputSpeech, cardText, cardTitle, repromptMessage, endSession): 
+    def build_response(self, response): 
         """
         Description: The response of our Lambda function should be in a json format. 
         That is why in this part of the code we define the functions which 
@@ -217,25 +195,27 @@ class SkillHandler:
         are used by both the intent handlers and the request handlers to 
         build the output.
 
-        Params: STRING outputSpeech - What alexa will say back to the user
-        STRING cardText - text to display on alex app
-        STRING cardTitle - text to display as the response title on mobile app
-        STRING repromptMessage - Message alexa will say while waiting for next input
-        BOOL endSession - determines whether the conversation with alexa is over
+        Params: 
+        DICT response which holds the following args
+            STRING outputSpeech - What alexa will say back to the user
+            STRING cardText - text to display on alex app
+            STRING cardTitle - text to display as the response title on mobile app
+            STRING repromptMessage - Message alexa will say while waiting for next input
+            BOOL endSession - determines whether the conversation with alexa is over
 
-        Return: DICT response - a JSON response with structure alexa skill anticipates
+        Return: DICT formattedResponse - a JSON response with structure alexa skill anticipates
         """
         # Begin building JSON response for alexa skill
-        logger.info('Building JSON response for alexa skill...')
-        response = {}
-        response['version'] = '1.0'
-        response['response'] = {
-                'outputSpeech': self.build_output_speech(outputSpeech=outputSpeech),
-                'card': self.build_card(cardText=cardText, cardTitle=cardTitle),
-                'reprompt': {'outputSpeech': self.build_output_speech(outputSpeech=repromptMessage)},
-                'shouldEndSession': endSession}
-        logger.info('JSON response to return to alexa skill={}'.format(response))
-        return response
+        logger.info('Building JSON formattedResponse for alexa skill...')
+        formattedResponse = {}
+        formattedResponse['version'] = '1.0'
+        formattedResponse['response'] = {
+                'outputSpeech': self.build_output_speech(outputSpeech=response['outputSpeech']),
+                'card': self.build_card(cardText=response['cardText'], cardTitle=response['cardTitle']),
+                'reprompt': {'outputSpeech': self.build_output_speech(outputSpeech=response['repromptMessage'])},
+                'shouldEndSession': response['endSession']}
+        logger.info('JSON formattedResponse to return to alexa skill={}'.format(formattedResponse))
+        return formattedResponse
 
     def build_output_speech(self, outputSpeech):
         """
