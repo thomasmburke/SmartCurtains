@@ -2,8 +2,8 @@ import json
 import boto3
 import logging
 
-# TODO: Think if it makes sense to put all these responses in dynamodb
-# TODO: get rid of remprompt where endSession is true
+# TODO: get rid of remprompt where endSession is true (in json)
+# TODO: make SkillHandler a virtual class and Curtain child class
 
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
@@ -33,6 +33,8 @@ class SkillHandler:
         self.event = event
         self.requestType = event['request']['type']
         self.curtainCmds = ['open', 'close', 'shut']
+        with open('response_config.json') as f:
+           self.response = json.load(f)
 
     def handle_skill(self):
         """
@@ -46,7 +48,7 @@ class SkillHandler:
         do/say next
         """
         logger.info('got event: {}'.format(self.event))
-                requestTypeFunc = {
+        requestTypeFunc = {
             'LaunchRequest': self.launch_handler,
             'IntentRequest': self.intent_handler,
             }
@@ -260,3 +262,8 @@ class SkillHandler:
         logger.info('building card to display on users mobile app...')
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
+
+if __name__=='__main__':
+    with open('intent_request.json') as intentRequest:
+        event = json.load(intentRequest)
+    print(alexa_publish_to_thing(event=event, context=None))
