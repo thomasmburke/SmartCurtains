@@ -2,8 +2,8 @@ import json
 import boto3
 import logging
 
-# TODO: Turn into a skill_handler class
 # TODO: Think if it makes sense to put all these responses in dynamodb
+# TODO: get rid of remprompt where endSession is true
 
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
@@ -46,6 +46,23 @@ class SkillHandler:
         do/say next
         """
         logger.info('got event: {}'.format(self.event))
+                requestTypeFunc = {
+            'LaunchRequest': self.launch_handler,
+            'IntentRequest': self.intent_handler,
+            }
+        if self.requestType in requestTypeFunc:
+            logger.info('received a {} requestType'.format(self.requestType))
+            return requestTypeFunc[self.requestType](self.event)
+        else:
+            logging.info('Session Ended.')
+            return
+
+    def mqtt_message(self):
+        """
+        Description: Send MQTT message to raspberry pi
+
+        Return: TBD
+        """
         # Initialize iot client to publish messages to a IoT thing
         logger.info('connecting to iot-data module...')
         client = boto3.client('iot-data', region_name='us-east-1')
@@ -59,16 +76,7 @@ class SkillHandler:
             qos=QoS,
             payload=json.dumps({'foo': 'bar'})
         )
-        requestTypeFunc = {
-            'LaunchRequest': self.launch_handler,
-            'IntentRequest': self.intent_handler,
-            }
-        if self.requestType in requestTypeFunc:
-            logger.info('received a {} requestType'.format(self.requestType))
-            return requestTypeFunc[self.requestType](self.event)
-        else:
-            logging.info('Session Ended.')
-            return
+
 
     def launch_handler(self, event):
         """
