@@ -1,4 +1,4 @@
-from context import src
+from .context import src
 from src.MQTTPublish.alexa_publish_to_thing import SkillHandler
 import json
 import pytest
@@ -56,7 +56,15 @@ def curtain_close_skill_handler():
 BEGIN UNIT TESTS
 """
 
-
 def test_skill_name(launch_skill_handler):
     assert launch_skill_handler.skillName == 'GPIOControl'
-
+"""
+TESTS TO MAKE:
+- Test __init__: (give different skillIds, requestTypes)
+    requestType
+    skillName
+    intentResponse
+    curtainCmds
+- Test alexa_publish_to_thing with several different events
+- Test handle_skill for both launch and intent requestType
+"""
