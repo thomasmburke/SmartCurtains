@@ -100,31 +100,39 @@ Test __init__ settings
 
 def test_curtain_skill_name(invalid_skill_id_skill_handler):
     assert invalid_skill_id_skill_handler.skillName == 'GPIOControl'
+    assert isinstance(invalid_skill_id_skill_handler.skillName, str)
 
 
 def test_invalid_skill_name(launch_skill_handler):
     assert launch_skill_handler.skillName == 'GPIOControl'
+    assert isinstance(launch_skill_handler.skillName, str)
 
 
 def test_intent_request_type(curtain_close_skill_handler, stop_skill_handler):
     assert curtain_close_skill_handler.requestType == 'IntentRequest'
     assert stop_skill_handler.requestType == 'IntentRequest'
+    assert isinstance(curtain_close_skill_handler.requestType, str)
+    assert isinstance(stop_skill_handler.requestType, str)
 
 
 def test_launch_request_type(launch_skill_handler):
     assert launch_skill_handler.requestType == 'LaunchRequest'
+    assert isinstance(launch_skill_handler.requestType, str)
 
 
 def test_curtain_commands(launch_skill_handler):
     assert launch_skill_handler.curtainCmds == ['open', 'close', 'shut']
+    assert isinstance(launch_skill_handler.curtainCmds, list)
 
 
 def test_intent_response_with_invalid_skill_id(invalid_skill_id_skill_handler):
     assert invalid_skill_id_skill_handler.intentResponse == responseConfig['GPIOControl']
+    assert isinstance(invalid_skill_id_skill_handler.intentResponse, dict)
 
 
 def test_intent_response_with_curtain_skill_id(curtain_close_skill_handler):
     assert curtain_close_skill_handler.intentResponse == responseConfig['GPIOControl']
+    assert isinstance(curtain_close_skill_handler.intentResponse, dict)
 
 """
 Test SkillHandler methods
@@ -132,10 +140,12 @@ Test SkillHandler methods
 
 def test_launch_request_handle_skill(launch_skill_handler):
     assert launch_skill_handler.handle_skill() == launchDict
+    assert isinstance(launch_skill_handler.handle_skill(), dict)
 
 
 def test_intent_request_handle_skill(curtain_close_skill_handler):
     assert curtain_close_skill_handler.handle_skill() == curtainCloseDict
+    assert isinstance(curtain_close_skill_handler.handle_skill(), dict)
 
 
 """
