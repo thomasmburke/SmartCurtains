@@ -1,0 +1,23 @@
+{
+	"body": {
+		"version": "1.0",
+		"response": {
+			"outputSpeech": {
+				"type": "PlainText",
+				"text": "Hi, welcome to the raspberry pi alexa skill"
+			},
+			"card": {
+				"type": "Simple",
+				"title": "Curain Command",
+				"content": "Supply a command for the curtain"
+			},
+			"reprompt": {
+				"outputSpeech": {
+					"type": "PlainText",
+					"text": "Please supply an appropriate pi command"
+				}
+			},
+			"shouldEndSession": false
+		}
+	}
+}

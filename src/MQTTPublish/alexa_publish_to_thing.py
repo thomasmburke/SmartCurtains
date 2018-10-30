@@ -50,8 +50,6 @@ class SkillHandler:
         of the class. Administering necessary commands to send MQTT messages 
         to the raspberry pi and proper JSON back to alexa
 
-        Params: DICT event - a JSON request sent by alexa
-
         Return: DICT response - a JSON response to instruct alexa on what to 
         do/say next
         """
