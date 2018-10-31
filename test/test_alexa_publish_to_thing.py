@@ -30,9 +30,25 @@ def launch_skill_handler():
 
 
 @pytest.fixture
+def session_ended_skill_handler():
+    '''Returns a SkillHandler instance with a sessionEnded request event'''
+    with open('{}/session_ended_request.json'.format(jsonRequestsPath)) as f:
+        event = json.load(f)
+    return SkillHandler(event=event, responseConfig=responseConfig)
+
+
+@pytest.fixture
 def stop_skill_handler():
     '''Returns a SkillHandler instance with a stop request event'''
     with open('{}/stop_request.json'.format(jsonRequestsPath)) as f:
+        event = json.load(f)
+    return SkillHandler(event=event, responseConfig=responseConfig)
+
+
+@pytest.fixture
+def cancel_skill_handler():
+    '''Returns a SkillHandler instance with a cancel request event'''
+    with open('{}/cancel_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
     return SkillHandler(event=event, responseConfig=responseConfig)
 
@@ -85,6 +101,27 @@ curtainCloseDict = {'outputSpeech': 'You have chosen to close the curtain',
     'cardText': 'You have chosen to close the curtain', 
     'cardTitle': 'Curtain Adjustment', 
     'endSession': True}
+stopDict = {
+    "outputSpeech": "Thank you. Bye!",
+    "repromptMessage": "",
+    "cardText": "Bye.",
+    "cardTitle": "Bye Bye.",
+    "endSession": True
+}
+assistanceDict = {
+    "outputSpeech": "You can choose among the following curtain commands open,close,shut",
+    "repromptMessage": "Do you want to perform another curtain comand?",
+    "cardText": "You have asked for help.",
+    "cardTitle": "HELP",
+    "endSession": False
+}
+fallbackDict = {
+    "outputSpeech": "I can not help you with that, try rephrasing the question or ask for help by saying HELP.",
+    "repromptMessage": "Do you want to perform another curtain comand?",
+    "cardText": "You have given an invalid command",
+    "cardTitle": "Invalid command",
+    "endSession": False
+}
 
 
 #################################
@@ -146,6 +183,38 @@ def test_launch_request_handle_skill(launch_skill_handler):
 def test_intent_request_handle_skill(curtain_close_skill_handler):
     assert curtain_close_skill_handler.handle_skill() == curtainCloseDict
     assert isinstance(curtain_close_skill_handler.handle_skill(), dict)
+
+
+def test_session_ended_request_handle_skill(session_ended_skill_handler):
+    assert session_ended_skill_handler.handle_skill() == stopDict
+    assert isinstance(session_ended_skill_handler.handle_skill(), dict)
+
+
+def test_launch_handler(launch_skill_handler):
+    assert launch_skill_handler.launch_handler() == launchDict
+    assert isinstance(launch_skill_handler.launch_handler(), dict)
+
+
+def test_intent_handler_with_close_curtain_intent(curtain_close_skill_handler):
+    assert curtain_close_skill_handler.intent_handler() == curtainCloseDict
+    assert isinstance(curtain_close_skill_handler.intent_handler(), dict)
+
+
+def test_intent_handler_with_stop_intent(stop_skill_handler,cancel_skill_handler):
+    assert stop_skill_handler.intent_handler() == stopDict
+    assert cancel_skill_handler.intent_handler() == stopDict
+    assert isinstance(stop_skill_handler.intent_handler(), dict)
+    assert isinstance(cancel_skill_handler.intent_handler(), dict)
+
+
+def test_intent_handler_with_assistance_intent(assistance_skill_handler):
+    assert assistance_skill_handler.intent_handler() == assistanceDict
+    assert isinstance(assistance_skill_handler.intent_handler(), dict)
+
+
+def test_intent_handler_with_fallback_intent(fallback_skill_handler):
+    assert fallback_skill_handler.intent_handler() == fallbackDict
+    assert isinstance(fallback_skill_handler.intent_handler(), dict)
 
 
 """

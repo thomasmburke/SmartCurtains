@@ -64,7 +64,7 @@ class SkillHandler:
             return response
         else:
             logging.info('Session Ended.')
-            return None
+            return self.stop()
 
     def mqtt_message(self):
         """
