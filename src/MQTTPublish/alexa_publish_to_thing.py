@@ -147,7 +147,7 @@ class SkillHandler:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
             curtainResponse = self.intentResponse['invalidIntentResponse']
             for k, v in curtainResponse.items():
-                curtainResponse[k] = v.format(curtainCmd)
+                curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
         return curtainResponse
 
     def stop(self):
@@ -238,9 +238,9 @@ class SkillHandler:
         logger.info('building card to display on users mobile app...')
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
-"""
+'''
 if __name__=='__main__':
     with open('intent_request.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
-"""
+'''
