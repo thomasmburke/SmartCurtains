@@ -238,9 +238,9 @@ class SkillHandler:
         logger.info('building card to display on users mobile app...')
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
-'''
+
 if __name__=='__main__':
     with open('intent_request.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
-'''
+

@@ -85,6 +85,22 @@ def curtain_close_skill_handler():
     return SkillHandler(event=event, responseConfig=responseConfig)
 
 
+@pytest.fixture
+def curtain_open_skill_handler():
+    '''Returns a SkillHandler instance with a curtain open request event'''
+    with open('{}/curtain_open_request.json'.format(jsonRequestsPath)) as f:
+        event = json.load(f)
+    return SkillHandler(event=event, responseConfig=responseConfig)
+
+
+@pytest.fixture
+def invalid_curtain_intent_skill_handler():
+    '''Returns a SkillHandler instance with a invalid curtain intent request event'''
+    with open('{}/invalid_curtain_command_request.json'.format(jsonRequestsPath)) as f:
+        event = json.load(f)
+    return SkillHandler(event=event, responseConfig=responseConfig)
+
+
 #################################
 #                               #
 #     Other Key Declarations    #
@@ -99,6 +115,11 @@ launchDict = {'outputSpeech': 'Hi, welcome to the raspberry pi alexa skill',
 curtainCloseDict = {'outputSpeech': 'You have chosen to close the curtain', 
     'repromptMessage': 'Do you want to adjust the curtain setting again?', 
     'cardText': 'You have chosen to close the curtain', 
+    'cardTitle': 'Curtain Adjustment', 
+    'endSession': True}
+curtainOpenDict = {'outputSpeech': 'You have chosen to open the curtain', 
+    'repromptMessage': 'Do you want to adjust the curtain setting again?', 
+    'cardText': 'You have chosen to open the curtain', 
     'cardTitle': 'Curtain Adjustment', 
     'endSession': True}
 stopDict = {
@@ -200,7 +221,13 @@ def test_intent_handler_with_close_curtain_intent(curtain_close_skill_handler):
     assert isinstance(curtain_close_skill_handler.intent_handler(), dict)
 
 
-def test_intent_handler_with_stop_intent(stop_skill_handler,cancel_skill_handler):
+# def test_intent_handler_with_open_curtain_intent(curtain_open_skill_handler):
+#     import pdb; pdb.set_trace()
+#     assert curtain_open_skill_handler.intent_handler() == curtainOpenDict
+#     assert isinstance(curtain_open_skill_handler.intent_handler(), dict)
+
+
+def test_intent_handler_with_stop_or_cancel_intent(stop_skill_handler,cancel_skill_handler):
     assert stop_skill_handler.intent_handler() == stopDict
     assert cancel_skill_handler.intent_handler() == stopDict
     assert isinstance(stop_skill_handler.intent_handler(), dict)
