@@ -11,7 +11,7 @@ with open('../src/MQTTPublish/response_config.json') as f:
     responseConfig = json.load(f)
 # Get sample launch response
 with open('{}/launch_response.json'.format(jsonResponsesPath)) as f:
-    launchResponse = json.load(f)
+    launchResponse = json.load(f)['body']
 
 
 #################################
@@ -98,7 +98,7 @@ def curtain_close_skill_handler():
 @pytest.fixture
 def invalid_curtain_intent_skill_handler():
     '''Returns a SkillHandler instance with a invalid curtain intent request event'''
-    with open('{}/invalid_curtain_command_request.json'.format(jsonRequestsPath)) as f:
+    with open('{}/invalid_curtain_intent_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
     yield SkillHandler(event=event, responseConfig=responseConfig)
 
@@ -124,6 +124,13 @@ curtainOpenDict = {'outputSpeech': 'You have chosen to open the curtain',
     'cardText': 'You have chosen to open the curtain', 
     'cardTitle': 'Curtain Adjustment', 
     'endSession': True}
+invalidCurtainIntentDict = {
+    "outputSpeech": "plow is a curtain command not supported by the raspberry pi",
+    "repromptMessage": "Do you want to perform an action on the curtains?",
+    "cardText": "plow is a curtain command not supported by the raspberry pi",
+    "cardTitle": "Invalid curtain command",
+    "endSession": True
+}
 stopDict = {
     "outputSpeech": "Thank you. Bye!",
     "repromptMessage": "",
@@ -203,6 +210,7 @@ def test_intent_response_with_curtain_open_skill_id(curtain_open_skill_handler):
 Test SkillHandler methods
 """
 
+# HANDLE_SKILL()
 def test_launch_request_handle_skill(launch_skill_handler):
     assert launch_skill_handler.handle_skill() == launchDict
     assert isinstance(launch_skill_handler.handle_skill(), dict)
@@ -221,12 +229,12 @@ def test_session_ended_request_handle_skill(session_ended_skill_handler):
     assert session_ended_skill_handler.handle_skill() == stopDict
     assert isinstance(session_ended_skill_handler.handle_skill(), dict)
 
-
+# LAUNCH_HANDLER()
 def test_launch_handler(launch_skill_handler):
     assert launch_skill_handler.launch_handler() == launchDict
     assert isinstance(launch_skill_handler.launch_handler(), dict)
 
-
+# INTENT_HANDLER()
 def test_intent_handler_with_open_curtain_intent(curtain_open_skill_handler):
     assert curtain_open_skill_handler.intent_handler() == curtainOpenDict
     assert isinstance(curtain_open_skill_handler.intent_handler(), dict)
@@ -253,9 +261,51 @@ def test_intent_handler_with_fallback_intent(fallback_skill_handler):
     assert fallback_skill_handler.intent_handler() == fallbackDict
     assert isinstance(fallback_skill_handler.intent_handler(), dict)
 
-
+# CURTAIN_CONTROL()
 def test_curtain_control_with_open_command(curtain_open_skill_handler):
     assert curtain_open_skill_handler.curtain_control() == curtainOpenDict
     assert isinstance(curtain_open_skill_handler.curtain_control(), dict)
 
+
+def test_curtain_control_with_close_command(curtain_close_skill_handler):
+    assert curtain_close_skill_handler.curtain_control() == curtainCloseDict
+    assert isinstance(curtain_close_skill_handler.curtain_control(), dict)
+
+
+def test_curtain_control_with_close_command(invalid_curtain_intent_skill_handler):
+    assert invalid_curtain_intent_skill_handler.curtain_control() == invalidCurtainIntentDict
+    assert isinstance(invalid_curtain_intent_skill_handler.curtain_control(), dict)
+
+# STOP()
+def test_stop(stop_skill_handler):
+    assert stop_skill_handler.stop() == stopDict
+    assert isinstance(stop_skill_handler.stop(), dict)
+
+# ASSISTANCE()
+def test_assistance(assistance_skill_handler):
+    assert assistance_skill_handler.assistance() == assistanceDict
+    assert isinstance(assistance_skill_handler.assistance(), dict)
+
+# FALLBACK()
+def test_fallback(fallback_skill_handler):
+    assert fallback_skill_handler.fallback() == fallbackDict
+    assert isinstance(fallback_skill_handler.fallback(), dict)
+
+# BUILD_RESPONSE
+def test_build_response(launch_skill_handler):
+    assert launch_skill_handler.build_response(response=launchDict) == launchResponse
+    assert isinstance(launch_skill_handler.build_response(response=launchDict), dict)
+
+# BUILD_OUTPUT_SPEECH
+def test_build_output_speech(launch_skill_handler):
+    outputSpeech = 'outputSpeech'
+    assert launch_skill_handler.build_output_speech(outputSpeech) == {'type': 'PlainText', 'text': outputSpeech}
+    assert isinstance(launch_skill_handler.build_output_speech(outputSpeech), dict)
+
+# BUILD_CARD
+def test_build_card(launch_skill_handler):
+    cardTitle = 'Title'
+    cardText = 'Text'
+    assert launch_skill_handler.build_card(cardText=cardText, cardTitle=cardTitle) == {'type': 'Simple', 'title': cardTitle, 'content': cardText}
+    assert isinstance(launch_skill_handler.build_card(cardText=cardText, cardTitle=cardTitle), dict)
 
