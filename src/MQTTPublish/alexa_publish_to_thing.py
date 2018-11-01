@@ -1,6 +1,7 @@
 import json
 import boto3
 import logging
+import copy
 
 # TODO: get rid of remprompt where endSession is true (in json)
 
@@ -140,12 +141,12 @@ class SkillHandler:
         # Check to see if user supplied curtain command is in valid command list
         if curtainCmd in self.curtainCmds:
             logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
-            curtainResponse = self.intentResponse['validIntentResponse']
+            curtainResponse = copy.deepcopy(self.intentResponse['validIntentResponse'])
             for k, v in curtainResponse.items():
-                curtainResponse[k] = v.format(curtainCmd) if isinstance(v,str) else v
+                curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
-            curtainResponse = self.intentResponse['invalidIntentResponse']
+            curtainResponse = copy.deepcopy(self.intentResponse['invalidIntentResponse'])
             for k, v in curtainResponse.items():
                 curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
         return curtainResponse

@@ -26,7 +26,7 @@ def launch_skill_handler():
     '''Returns a SkillHandler instance with a launch request event'''
     with open('{}/launch_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def session_ended_skill_handler():
     '''Returns a SkillHandler instance with a sessionEnded request event'''
     with open('{}/session_ended_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def stop_skill_handler():
     '''Returns a SkillHandler instance with a stop request event'''
     with open('{}/stop_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def cancel_skill_handler():
     '''Returns a SkillHandler instance with a cancel request event'''
     with open('{}/cancel_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def assistance_skill_handler():
     '''Returns a SkillHandler instance with an assistance request event'''
     with open('{}/assistance_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -66,7 +66,7 @@ def fallback_skill_handler():
     '''Returns a SkillHandler instance with a fallback request event'''
     with open('{}/fallback_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 @pytest.fixture
@@ -74,23 +74,25 @@ def invalid_skill_id_skill_handler():
     '''Returns a SkillHandler instance with a invalid skillId'''
     with open('{}/invalid_skill_id_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
-@pytest.fixture
-def curtain_close_skill_handler():
-    '''Returns a SkillHandler instance with a curtain close request event'''
-    with open('{}/curtain_close_request.json'.format(jsonRequestsPath)) as f:
-        event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
-
-
-@pytest.fixture
+@pytest.fixture(scope='function')
 def curtain_open_skill_handler():
     '''Returns a SkillHandler instance with a curtain open request event'''
     with open('{}/curtain_open_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    curtainOpen = SkillHandler(event=event, responseConfig=responseConfig)
+    yield curtainOpen
+
+
+@pytest.fixture(scope='function')
+def curtain_close_skill_handler():
+    '''Returns a SkillHandler instance with a curtain close request event'''
+    with open('{}/curtain_close_request.json'.format(jsonRequestsPath)) as f:
+        event = json.load(f)
+    curtainClose = SkillHandler(event=event, responseConfig=responseConfig)
+    yield curtainClose
 
 
 @pytest.fixture
@@ -98,7 +100,7 @@ def invalid_curtain_intent_skill_handler():
     '''Returns a SkillHandler instance with a invalid curtain intent request event'''
     with open('{}/invalid_curtain_command_request.json'.format(jsonRequestsPath)) as f:
         event = json.load(f)
-    return SkillHandler(event=event, responseConfig=responseConfig)
+    yield SkillHandler(event=event, responseConfig=responseConfig)
 
 
 #################################
@@ -188,9 +190,14 @@ def test_intent_response_with_invalid_skill_id(invalid_skill_id_skill_handler):
     assert isinstance(invalid_skill_id_skill_handler.intentResponse, dict)
 
 
-def test_intent_response_with_curtain_skill_id(curtain_close_skill_handler):
+def test_intent_response_with_curtain_close_skill_id(curtain_close_skill_handler):
     assert curtain_close_skill_handler.intentResponse == responseConfig['GPIOControl']
     assert isinstance(curtain_close_skill_handler.intentResponse, dict)
+
+
+def test_intent_response_with_curtain_open_skill_id(curtain_open_skill_handler):
+    assert curtain_open_skill_handler.intentResponse == responseConfig['GPIOControl']
+    assert isinstance(curtain_open_skill_handler.intentResponse, dict)
 
 """
 Test SkillHandler methods
@@ -205,6 +212,10 @@ def test_intent_request_handle_skill(curtain_close_skill_handler):
     assert curtain_close_skill_handler.handle_skill() == curtainCloseDict
     assert isinstance(curtain_close_skill_handler.handle_skill(), dict)
 
+def test_open_intent_request_handle_skill(curtain_open_skill_handler):
+    assert curtain_open_skill_handler.handle_skill() == curtainOpenDict
+    assert isinstance(curtain_open_skill_handler.handle_skill(), dict)
+
 
 def test_session_ended_request_handle_skill(session_ended_skill_handler):
     assert session_ended_skill_handler.handle_skill() == stopDict
@@ -216,15 +227,14 @@ def test_launch_handler(launch_skill_handler):
     assert isinstance(launch_skill_handler.launch_handler(), dict)
 
 
+def test_intent_handler_with_open_curtain_intent(curtain_open_skill_handler):
+    assert curtain_open_skill_handler.intent_handler() == curtainOpenDict
+    assert isinstance(curtain_open_skill_handler.intent_handler(), dict)
+
+
 def test_intent_handler_with_close_curtain_intent(curtain_close_skill_handler):
     assert curtain_close_skill_handler.intent_handler() == curtainCloseDict
     assert isinstance(curtain_close_skill_handler.intent_handler(), dict)
-
-
-# def test_intent_handler_with_open_curtain_intent(curtain_open_skill_handler):
-#     import pdb; pdb.set_trace()
-#     assert curtain_open_skill_handler.intent_handler() == curtainOpenDict
-#     assert isinstance(curtain_open_skill_handler.intent_handler(), dict)
 
 
 def test_intent_handler_with_stop_or_cancel_intent(stop_skill_handler,cancel_skill_handler):
@@ -244,8 +254,8 @@ def test_intent_handler_with_fallback_intent(fallback_skill_handler):
     assert isinstance(fallback_skill_handler.intent_handler(), dict)
 
 
-"""
-TESTS TO MAKE:
-- Test alexa_publish_to_thing with several different events
-- Test handle_skill for both launch and intent requestType
-"""
+def test_curtain_control_with_open_command(curtain_open_skill_handler):
+    assert curtain_open_skill_handler.curtain_control() == curtainOpenDict
+    assert isinstance(curtain_open_skill_handler.curtain_control(), dict)
+
+
