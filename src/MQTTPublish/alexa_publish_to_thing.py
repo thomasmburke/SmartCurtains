@@ -40,7 +40,7 @@ class SkillHandler:
         self.curtainCmds = ['open', 'close', 'shut']
         try:
             self.skillName = responseConfig['skillNames'][event['session']['application']['applicationId']]
-        except:
+        except Exception as e:
             logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
             self.skillName = 'GPIOControl'
         self.intentResponse = responseConfig[self.skillName]
@@ -67,7 +67,7 @@ class SkillHandler:
             logging.info('Session Ended.')
             return self.stop()
 
-    def mqtt_message(self):
+    def mqtt_message(self, curtainCmd):
         """
         Description: Send MQTT message to raspberry pi
 
@@ -84,7 +84,7 @@ class SkillHandler:
         client.publish(
             topic=topic,  # '$aws/things/pi/shadow/update',
             qos=QoS,
-            payload=json.dumps({'foo': 'bar'})
+            payload=json.dumps({'command': curtainCmd})
         )
 
     def launch_handler(self):
@@ -121,9 +121,8 @@ class SkillHandler:
         if intentName in intentFunc:
             response = intentFunc[intentName]()
         else:
-            response = self.stop(event) 
+            response = self.stop(self.event) 
         return response
-
 
     def curtain_control(self):
         """
@@ -144,6 +143,7 @@ class SkillHandler:
             curtainResponse = copy.deepcopy(self.intentResponse['validIntentResponse'])
             for k, v in curtainResponse.items():
                 curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
+            self.curtain_control(curtainCmd=curtainCmd)
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
             curtainResponse = copy.deepcopy(self.intentResponse['invalidIntentResponse'])
