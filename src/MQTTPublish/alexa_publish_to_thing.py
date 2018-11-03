@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def alexa_publish_to_thing(event, context):
+def alexa_publish_to_thing(event, context, filename='response_config.json'):
     """
     Description: This is lambda's handler function that will leverage the
     SkillHandler class to interpret a request from alexa and return the 
     appropriate response
     """
     # Gather response config
-    with open('response_config.json') as f:
+    with open(filename) as f:
         responseConfig = json.load(f)
     skillHandler = SkillHandler(event=event, responseConfig=responseConfig)
     response = skillHandler.handle_skill()
@@ -239,9 +239,9 @@ class SkillHandler:
         logger.info('building card to display on users mobile app...')
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
-
+"""
 if __name__=='__main__':
     with open('intent_request.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
-
+"""

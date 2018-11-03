@@ -2,6 +2,7 @@ from .context import src
 from src.MQTTPublish.alexa_publish_to_thing import SkillHandler
 import json
 import pytest
+from unittest.mock import patch, mock_open
 
 
 jsonRequestsPath = 'alexa_json_messages/json_requests'
@@ -12,6 +13,9 @@ with open('../src/MQTTPublish/response_config.json') as f:
 # Get sample launch response
 with open('{}/launch_response.json'.format(jsonResponsesPath)) as f:
     launchResponse = json.load(f)['body']
+# Sample event for alexa_publish_to_thing
+with open('{}/launch_request.json'.format(jsonRequestsPath)) as f:
+    alexaEvent = json.load(f)
 
 
 #################################
@@ -309,3 +313,9 @@ def test_build_card(launch_skill_handler):
     assert launch_skill_handler.build_card(cardText=cardText, cardTitle=cardTitle) == {'type': 'Simple', 'title': cardTitle, 'content': cardText}
     assert isinstance(launch_skill_handler.build_card(cardText=cardText, cardTitle=cardTitle), dict)
 
+#TODO: finish this mocking exercise
+# ALEXA_PUBLISH_TO_THING
+def test_alexa_publish_to_thing(event=alexaEvent,context=None,filename='response_config.json'):
+    with patch('builtins.open', mock_open(read_data="data")) as mockFile:
+        assert open(filename).read() == 'data'
+        mockFile.assert_called_with(filename)
