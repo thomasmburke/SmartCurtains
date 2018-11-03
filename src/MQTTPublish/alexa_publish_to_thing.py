@@ -143,7 +143,7 @@ class SkillHandler:
             curtainResponse = copy.deepcopy(self.intentResponse['validIntentResponse'])
             for k, v in curtainResponse.items():
                 curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
-            self.curtain_control(curtainCmd=curtainCmd)
+            self.mqtt_message(curtainCmd=curtainCmd)
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
             curtainResponse = copy.deepcopy(self.intentResponse['invalidIntentResponse'])
