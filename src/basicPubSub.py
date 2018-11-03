@@ -1,6 +1,5 @@
 # Import SDK packages
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-from time import sleep
 import os
 import json
 
@@ -23,10 +22,9 @@ def poll_mqtt_messages():
     iotEndpoint = os.environ['IOT_ENDPOINT']
     MQTT_PORT = 8883
 
-
     #################################
     #                               #
-    #     ESTABLISH CONNECTION      #
+    #     CONFIGURE CONNECTION      #
     #                               #
     #################################
     # For certificate based connection
@@ -40,19 +38,16 @@ def poll_mqtt_messages():
     myMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
     myMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
-    payload = {
-            'status': 'available'
-            }
-
-
+    #################################
+    #                               #
+    #     ESTABLISH CONNECTION      #
+    #                               #
+    #################################
     myMQTTClient.connect()
-    myMQTTClient.publish(topic="raspberrypi3", payload=json.dumps(payload),QoS=0)
+    # Subscribe to topic that the alexa lambda function is publishing to
     myMQTTClient.subscribe(topic="raspberrypi3", QoS=0, callback=customCallback)
     while True:
-        myMQTTClient.publish(topic="raspberrypi3", payload=json.dumps(payload),QoS=0)
-        sleep(60)
-    #myMQTTClient.unsubscribe(topic="myTopic")
-    myMQTTClient.disconnect()
+        pass
 
 
 # Custom MQTT message callback
