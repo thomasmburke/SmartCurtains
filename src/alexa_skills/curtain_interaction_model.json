@@ -1,0 +1,98 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "raspberry pi",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "GPIOControl",
+                    "slots": [
+                        {
+                            "name": "pin",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "status",
+                            "type": "GPIO_CONTROL"
+                        }
+                    ],
+                    "samples": [
+                        "GPIOControl to {status} the curtains",
+                        "GPIOControl to turn pin {pin} {status}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "GPIO_CONTROL",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "shut"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "close"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "open"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "down"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "up"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "low"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "high"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "off"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "on"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
