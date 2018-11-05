@@ -2,7 +2,7 @@
 Messing around with RaspberryPi and AWS
 
 # Current Project
-Automated Curtains:
+Automated Curtains
 ## Goal
 The end goal is to fully automate the openining and closing of my two living room curtains using voice commands
 ## Technology Leveraged
