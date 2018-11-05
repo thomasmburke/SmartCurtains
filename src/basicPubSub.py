@@ -57,6 +57,9 @@ def customCallback(client, userdata, message):
     print("from topic: ")
     print(message.topic)
     print("--------------\n\n")
+    if message.payload == 'open':
+        print('received message and ready for action')
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     poll_mqtt_messages()

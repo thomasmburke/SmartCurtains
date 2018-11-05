@@ -1,4 +1,4 @@
-# smarthome
+# Smarthome
 Messing around with RaspberryPi and AWS
 
 # Current Project
