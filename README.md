@@ -21,5 +21,5 @@ The end goal is to fully automate the openining and closing of my two living roo
 * 8x AA batteries
 * 2x Custom 3D Printed motor wall mount
 * POWER FOR PI
-
+## Overview of Architecture
 ![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Curtain_Architecture.png)
