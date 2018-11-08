@@ -3,8 +3,6 @@ import boto3
 import logging
 import copy
 
-# TODO: get rid of remprompt where endSession is true (in json)
-
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
