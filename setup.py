@@ -20,5 +20,6 @@ setup(
     author='Thomas Burke',
     author_email='tburke@bu.edu',
     url='https://github.com/thomasmburke/smarthome',
-    packages=find_packages(exclude=('tests', 'docs'))
+    packages=find_packages(exclude=('tests', 'docs')),
+    tests_require=['pytest']
 )
