@@ -40,7 +40,7 @@ class SkillHandler:
             self.skillName = responseConfig['skillNames'][event['session']['application']['applicationId']]
         except Exception as e:
             logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
-            self.skillName = 'GPIOControl'
+            self.skillName = 'CurtainControl'
         self.intentResponse = responseConfig[self.skillName]
 
     def handle_skill(self):
@@ -106,7 +106,7 @@ class SkillHandler:
         """
         # Create function dictionary based on intent name
         intentFunc = {
-                'GPIOControl': self.curtain_control,
+                'CurtainControl': self.curtain_control,
                 'AMAZON.StopIntent': self.stop,
                 'AMAZON.CancelIntent': self.stop,
                 'AMAZON.HelpIntent': self.assistance,
