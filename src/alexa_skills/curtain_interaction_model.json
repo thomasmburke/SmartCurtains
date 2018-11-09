@@ -24,7 +24,7 @@
                     "samples": []
                 },
                 {
-                    "name": "GPIOControl",
+                    "name": "CurtainControl",
                     "slots": [
                         {
                             "name": "pin",
