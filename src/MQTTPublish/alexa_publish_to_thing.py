@@ -17,6 +17,7 @@ def alexa_publish_to_thing(event, context, filename='response_config.json'):
     """
     # Gather response config
     try:
+        # Query dynamo for skillName based off of skillId
         skillName = DynamoOps(skillName='skillIds').get_config()['ids'][event['session']['application']['applicationId']]
     except Exception as e:
         logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
@@ -36,13 +37,14 @@ class SkillHandler(DynamoOps):
 
     Params: DICT event - a JSON request from an alexa custom skill detailing
     an action/response to be taken
+        STRING skillName - the name of the skill to index dynamo with
     """
     def __init__(self, event, skillName):
         self.event = event
         self.requestType = event['request']['type']
         self.skillName = skillName
         DynamoOps.__init__(self, skillName=skillName)
-        self.skillConfig = super().get_config()  #responseConfig[self.skillName]
+        self.skillConfig = super().get_config()
 
     def handle_skill(self):
         """
@@ -133,7 +135,6 @@ class SkillHandler(DynamoOps):
         Return: DICT - curtainResponse gathered from response_config.json
         based on whether or not the command was valid
         """
-        # TODO: see if we can call alexa for appropriate slot values / store in dynamodb
         # Retrieve the curtain command supplied by the end user
         curtainCmd = self.event['request']['intent']['slots']['status']['value']
         # Check to see if user supplied curtain command is in valid command list
@@ -239,7 +240,9 @@ class SkillHandler(DynamoOps):
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
 
+"""
 if __name__=='__main__':
     with open('intent_request.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
+"""
