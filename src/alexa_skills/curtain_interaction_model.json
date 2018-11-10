@@ -27,23 +27,26 @@
                     "name": "CurtainControl",
                     "slots": [
                         {
-                            "name": "pin",
-                            "type": "AMAZON.NUMBER"
+                            "name": "status",
+                            "type": "status"
                         },
                         {
-                            "name": "status",
-                            "type": "GPIO_CONTROL"
+                            "name": "direction",
+                            "type": "direction"
                         }
                     ],
                     "samples": [
-                        "GPIOControl to {status} the curtains",
-                        "GPIOControl to turn pin {pin} {status}"
+                        "{status} the {direction} curtain",
+                        "{status} {direction} the curtains",
+                        "to {status} the {direction} curtain",
+                        "{status} the curtains",
+                        "to {status} the curtains"
                     ]
                 }
             ],
             "types": [
                 {
-                    "name": "GPIO_CONTROL",
+                    "name": "status",
                     "values": [
                         {
                             "name": {
@@ -59,35 +62,25 @@
                             "name": {
                                 "value": "open"
                             }
-                        },
+                        }
+                    ]
+                },
+                {
+                    "name": "direction",
+                    "values": [
                         {
                             "name": {
-                                "value": "down"
+                                "value": "both"
                             }
                         },
                         {
                             "name": {
-                                "value": "up"
+                                "value": "right"
                             }
                         },
                         {
                             "name": {
-                                "value": "low"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "high"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "off"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "on"
+                                "value": "left"
                             }
                         }
                     ]
