@@ -2,6 +2,7 @@ import json
 import boto3
 import logging
 import copy
+from dynamo_ops import DynamoOps
 
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
@@ -15,14 +16,18 @@ def alexa_publish_to_thing(event, context, filename='response_config.json'):
     appropriate response
     """
     # Gather response config
-    with open(filename) as f:
-        responseConfig = json.load(f)
-    skillHandler = SkillHandler(event=event, responseConfig=responseConfig)
+    try:
+        skillName = DynamoOps(skillName='skillIds').get_config()['ids'][event['session']['application']['applicationId']]
+    except Exception as e:
+        logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
+        skillName = 'CurtainControl'
+
+    skillHandler = SkillHandler(event=event, skillName=skillName)
     response = skillHandler.handle_skill()
     return skillHandler.build_response(response=response)
 
 
-class SkillHandler:
+class SkillHandler(DynamoOps):
     """
     Description: The SkillHandler class is used to inspect a JSON Request
     from an alexa skill and determine an appropriate response to send back.
@@ -32,16 +37,12 @@ class SkillHandler:
     Params: DICT event - a JSON request from an alexa custom skill detailing
     an action/response to be taken
     """
-    def __init__(self, event, responseConfig):
+    def __init__(self, event, skillName):
         self.event = event
         self.requestType = event['request']['type']
-        self.curtainCmds = ['open', 'close', 'shut']
-        try:
-            self.skillName = responseConfig['skillNames'][event['session']['application']['applicationId']]
-        except Exception as e:
-            logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
-            self.skillName = 'CurtainControl'
-        self.intentResponse = responseConfig[self.skillName]
+        self.skillName = skillName
+        DynamoOps.__init__(self, skillName=skillName)
+        self.skillConfig = super().get_config()  #responseConfig[self.skillName]
 
     def handle_skill(self):
         """
@@ -92,7 +93,7 @@ class SkillHandler:
 
         Return: DICT - response gathered from response_config.json
         """
-        return self.intentResponse['launchResponse']
+        return self.skillConfig['responses']['launchResponse']
 
     def intent_handler(self):
         """
@@ -119,7 +120,7 @@ class SkillHandler:
         if intentName in intentFunc:
             response = intentFunc[intentName]()
         else:
-            response = self.stop(self.event) 
+            response = self.stop() 
         return response
 
     def curtain_control(self):
@@ -136,15 +137,15 @@ class SkillHandler:
         # Retrieve the curtain command supplied by the end user
         curtainCmd = self.event['request']['intent']['slots']['status']['value']
         # Check to see if user supplied curtain command is in valid command list
-        if curtainCmd in self.curtainCmds:
+        if curtainCmd in self.skillConfig['slots']['status']:
             logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
-            curtainResponse = copy.deepcopy(self.intentResponse['validIntentResponse'])
+            curtainResponse = copy.deepcopy(self.skillConfig['responses']['validIntentResponse'])
             for k, v in curtainResponse.items():
                 curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
             self.mqtt_message(curtainCmd=curtainCmd)
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
-            curtainResponse = copy.deepcopy(self.intentResponse['invalidIntentResponse'])
+            curtainResponse = copy.deepcopy(self.skillConfig['responses']['invalidIntentResponse'])
             for k, v in curtainResponse.items():
                 curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
         return curtainResponse
@@ -156,7 +157,7 @@ class SkillHandler:
         Return: DICT - response gathered from response_config.json
         """
         logger.info('stopping alexa skill...')
-        return self.intentResponse['stopResponse']
+        return self.skillConfig['responses']['stopResponse']
         
     def assistance(self):
         """
@@ -166,9 +167,9 @@ class SkillHandler:
         Return: DICT - assistanceResponse gathered from response_config.json with curtain commands
         """
         logger.info('assistance method was called due to user saying HELP')
-        assistanceResponse = self.intentResponse['assistanceResponse']
+        assistanceResponse = self.skillConfig['responses']['assistanceResponse']
         for k, v in assistanceResponse.items():
-            assistanceResponse[k] = v.format(','.join(map(str, self.curtainCmds))) if isinstance(v, str) else v
+            assistanceResponse[k] = v.format(','.join(map(str, self.skillConfig['slots']['status']))) if isinstance(v, str) else v
         return assistanceResponse
 
     def fallback(self):
@@ -180,7 +181,7 @@ class SkillHandler:
         """
         logger.info('fallback method was called due to unexpected utterance after \
                 hearing the invocation name')
-        return self.intentResponse['fallbackResponse']
+        return self.skillConfig['responses']['fallbackResponse']
 
     def build_response(self, response): 
         """
