@@ -31,10 +31,17 @@
                 "cardTitle": "Invalid command",
                 "endSession": false
             },
-            "validIntentResponse": {
+            "validStatusIntentResponse": {
                 "outputSpeech": "You have chosen to {} the curtain",
                 "repromptMessage": "Do you want to adjust the curtain setting again?",
                 "cardText": "You have chosen to {} the curtain",
+                "cardTitle": "Curtain Adjustment",
+                "endSession": true
+            },
+            "validStatusDirectionIntentResponse": {
+                "outputSpeech": "You have chosen to {0} the {1} curtain",
+                "repromptMessage": "Do you want to adjust the curtain setting again?",
+                "cardText": "You have chosen to {0} the {1} curtain",
                 "cardTitle": "Curtain Adjustment",
                 "endSession": true
             },

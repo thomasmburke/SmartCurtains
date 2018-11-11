@@ -3,6 +3,7 @@ import boto3
 import logging
 import copy
 from dynamo_ops import DynamoOps
+from botocore.exceptions import ClientError
 
 # Initialize logger for CloudWatch logs
 logger = logging.getLogger(__name__)
@@ -15,11 +16,11 @@ def alexa_publish_to_thing(event, context, filename='response_config.json'):
     SkillHandler class to interpret a request from alexa and return the 
     appropriate response
     """
-    # Gather response config
+    # Gather skillName based off of skillId from dynamo
     try:
         # Query dynamo for skillName based off of skillId
         skillName = DynamoOps(skillName='skillIds').get_config()['ids'][event['session']['application']['applicationId']]
-    except Exception as e:
+    except ClientError as e:
         logger.error('got unexpected skillID: {}'.format(event['session']['application']['applicationId']))
         skillName = 'CurtainControl'
 
@@ -68,7 +69,7 @@ class SkillHandler(DynamoOps):
             logging.info('Session Ended.')
             return self.stop()
 
-    def mqtt_message(self, curtainCmd):
+    def mqtt_message(self, curtainCmd, curtainDirection):
         """
         Description: Send MQTT message to raspberry pi
 
@@ -85,7 +86,8 @@ class SkillHandler(DynamoOps):
         client.publish(
             topic=topic,  # '$aws/things/pi/shadow/update',
             qos=QoS,
-            payload=json.dumps({'command': curtainCmd})
+            payload=json.dumps({'command': curtainCmd,
+                'direction': curtainDirection})
         )
 
     def launch_handler(self):
@@ -137,13 +139,30 @@ class SkillHandler(DynamoOps):
         """
         # Retrieve the curtain command supplied by the end user
         curtainCmd = self.event['request']['intent']['slots']['status']['value']
+        curtainDirection = self.event['request']['intent']['slots']['direction'].get('value')
         # Check to see if user supplied curtain command is in valid command list
         if curtainCmd in self.skillConfig['slots']['status']:
-            logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
-            curtainResponse = copy.deepcopy(self.skillConfig['responses']['validIntentResponse'])
-            for k, v in curtainResponse.items():
-                curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
-            self.mqtt_message(curtainCmd=curtainCmd)
+            # Valid Status and Direction Request
+            if curtainDirection in self.skillConfig['slots']['direction']:
+                curtainDirection = 'left and right' if curtainDirection == 'both' else curtainDirection
+                curtainResponse = copy.deepcopy(self.skillConfig['responses']['validStatusDirectionIntentResponse'])
+                for k, v in curtainResponse.items():
+                    curtainResponse[k] = v.format(curtainCmd, curtainDirection) if isinstance(v, str) else v
+                self.mqtt_message(curtainCmd=curtainCmd, curtainDirection=curtainDirection)
+            # Invalid Direction Request
+            elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['direction']:
+                logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
+                curtainResponse = copy.deepcopy(self.skillConfig['responses']['invalidIntentResponse'])
+                for k, v in curtainResponse.items():
+                    curtainResponse[k] = v.format(curtainDirection) if isinstance(v, str) else v
+            # Valid Status Request
+            else:
+                logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
+                curtainResponse = copy.deepcopy(self.skillConfig['responses']['validStatusIntentResponse'])
+                for k, v in curtainResponse.items():
+                    curtainResponse[k] = v.format(curtainCmd) if isinstance(v, str) else v
+                self.mqtt_message(curtainCmd=curtainCmd,curtainDirection=None)
+        # Invalid Status Request
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
             curtainResponse = copy.deepcopy(self.skillConfig['responses']['invalidIntentResponse'])
@@ -240,9 +259,7 @@ class SkillHandler(DynamoOps):
         card = {'type': 'Simple', 'title': cardTitle, 'content': cardText}
         return card
 
-"""
 if __name__=='__main__':
-    with open('intent_request.json') as intentRequest:
+    with open('direction_status_intent.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
-"""

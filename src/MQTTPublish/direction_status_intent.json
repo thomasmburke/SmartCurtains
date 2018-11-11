@@ -1,0 +1,108 @@
+{
+	"version": "1.0",
+	"session": {
+		"new": true,
+		"sessionId": "amzn1.echo-api.session.4549fddf-5fd8-4cc0-a255-21203a8cb8ff",
+		"application": {
+			"applicationId": "amzn1.ask.skill.f0e6380a-50e1-4ffb-bdfc-b97f5e6949f4"
+		},
+		"user": {
+			"userId": "amzn1.ask.account.AEOSHGEQA2GNNTAVOY6KWBNMIYZOCF5G6GLDPFNB3JX5SQMAMUHJPCR2BHC7EHOF7YBKPQLY2WVAHD6WM6NTKQOSWUOSC6ZEMSLJQFLTH3AVJJWTQE3KWC6V3F3IOMRVJZO5QKJ3I5DGSLWNEOBWJCTYXY5H64QIJR6RA34JRRDJKOEVGH36RTOWEDRRULDDG4U2KPWWUMCN75Q"
+		}
+	},
+	"context": {
+		"System": {
+			"application": {
+				"applicationId": "amzn1.ask.skill.f0e6380a-50e1-4ffb-bdfc-b97f5e6949f4"
+			},
+			"user": {
+				"userId": "amzn1.ask.account.AEOSHGEQA2GNNTAVOY6KWBNMIYZOCF5G6GLDPFNB3JX5SQMAMUHJPCR2BHC7EHOF7YBKPQLY2WVAHD6WM6NTKQOSWUOSC6ZEMSLJQFLTH3AVJJWTQE3KWC6V3F3IOMRVJZO5QKJ3I5DGSLWNEOBWJCTYXY5H64QIJR6RA34JRRDJKOEVGH36RTOWEDRRULDDG4U2KPWWUMCN75Q"
+			},
+			"device": {
+				"deviceId": "amzn1.ask.device.AEYJ4DYRGELWE5A3KA2SYU3ADRRKR7CCIIC5DOYNXUMTVCSL3SGDGXI74A7OMJKLY2CNFL5VNHWXEW2XV2OCH57YNY2OLNN5L5JCTJRMFLTS4C7UKZLVQXGJIXTZ72ZULXLLQYNRBPFOO6J4HTVGJBYUG4WHQR6SOKAV3K5MPHIEGFVALEN52",
+				"supportedInterfaces": {}
+			},
+			"apiEndpoint": "https://api.amazonalexa.com",
+			"apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLmYwZTYzODBhLTUwZTEtNGZmYi1iZGZjLWI5N2Y1ZTY5NDlmNCIsImV4cCI6MTU0MTgxNTg4MywiaWF0IjoxNTQxODEyMjgzLCJuYmYiOjE1NDE4MTIyODMsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUVZSjREWVJHRUxXRTVBM0tBMlNZVTNBRFJSS1I3Q0NJSUM1RE9ZTlhVTVRWQ1NMM1NHREdYSTc0QTdPTUpLTFkyQ05GTDVWTkhXWEVXMlhWMk9DSDU3WU5ZMk9MTk41TDVKQ1RKUk1GTFRTNEM3VUtaTFZRWEdKSVhUWjcyWlVMWExMUVlOUkJQRk9PNko0SFRWR0pCWVVHNFdIUVI2U09LQVYzSzVNUEhJRUdGVkFMRU41MiIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFFT1NIR0VRQTJHTk5UQVZPWTZLV0JOTUlZWk9DRjVHNkdMRFBGTkIzSlg1U1FNQU1VSEpQQ1IyQkhDN0VIT0Y3WUJLUFFMWTJXVkFIRDZXTTZOVEtRT1NXVU9TQzZaRU1TTEpRRkxUSDNBVkpKV1RRRTNLV0M2VjNGM0lPTVJWSlpPNVFLSjNJNURHU0xXTkVPQldKQ1RZWFk1SDY0UUlKUjZSQTM0SlJSREpLT0VWR0gzNlJUT1dFRFJSVUxEREc0VTJLUFdXVU1DTjc1USJ9fQ.IzFZn-WbDKjMuJaKED48UWLmBk4CUthaCQgjSNJ3CFLD5SCGr3L96YrYkkoQuV2oo3A4-8e-4HgaJ20lgFWkw4wT9Apip-7CuiZWsuGe46PWkqErTDmVcPlCwv7DZmJcoD7Ditwr997op9EzF4t--uwGX6ARaI2h0zbHDUkP-uoOQ80B25_BRo06V2mIi4AVs6g81dbPKNZzt_RMnUEVAMQ4wz984ExccFQ7JE9gh5pFReUHY3dLqL-MBa5ClNC4wpQuqO9lMsVrKoMNVM0dt596eIClqqV_2rSX-G7oAF-YqMkEdlfLpB2NoukTXDEouBzPb0NDQRBfHmMEwa8NxQ"
+		},
+		"Viewport": {
+			"experiences": [
+				{
+					"arcMinuteWidth": 246,
+					"arcMinuteHeight": 144,
+					"canRotate": false,
+					"canResize": false
+				}
+			],
+			"shape": "RECTANGLE",
+			"pixelWidth": 1024,
+			"pixelHeight": 600,
+			"dpi": 160,
+			"currentPixelWidth": 1024,
+			"currentPixelHeight": 600,
+			"touch": [
+				"SINGLE"
+			]
+		}
+	},
+	"request": {
+		"type": "IntentRequest",
+		"requestId": "amzn1.echo-api.request.9b174b05-a431-4251-86a1-80d7c05cd0c1",
+		"timestamp": "2018-11-10T01:11:23Z",
+		"locale": "en-US",
+		"intent": {
+			"name": "CurtainControl",
+			"confirmationStatus": "NONE",
+			"slots": {
+				"status": {
+					"name": "status",
+					"value": "close",
+					"resolutions": {
+						"resolutionsPerAuthority": [
+							{
+								"authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.f0e6380a-50e1-4ffb-bdfc-b97f5e6949f4.status",
+								"status": {
+									"code": "ER_SUCCESS_MATCH"
+								},
+								"values": [
+									{
+										"value": {
+											"name": "close",
+											"id": "716f6b30598ba30945d84485e61c1027"
+										}
+									}
+								]
+							}
+						]
+					},
+					"confirmationStatus": "NONE",
+					"source": "USER"
+				},
+				"direction": {
+					"name": "direction",
+					"value": "both",
+					"resolutions": {
+						"resolutionsPerAuthority": [
+							{
+								"authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.f0e6380a-50e1-4ffb-bdfc-b97f5e6949f4.direction",
+								"status": {
+									"code": "ER_SUCCESS_MATCH"
+								},
+								"values": [
+									{
+										"value": {
+											"name": "right",
+											"id": "7c4f29407893c334a6cb7a87bf045c0d"
+										}
+									}
+								]
+							}
+						]
+					},
+					"confirmationStatus": "NONE",
+					"source": "USER"
+				}
+			}
+		}
+	}
+} 
