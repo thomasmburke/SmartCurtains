@@ -6,10 +6,11 @@ import threading
 import random
 
 
-class MotorOps:
+class MotorOps(Adafruit_MotorHAT):
 
     def __init__(self, message):
         self.message = message
+        Adafruit_MotorHAT.__init__(self)
 
     def interpret_message():
         """
