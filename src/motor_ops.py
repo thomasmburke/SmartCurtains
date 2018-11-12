@@ -45,9 +45,7 @@ myStepper2.setSpeed(60)          # 30 RPM
 stepstyles = [Adafruit_MotorHAT.SINGLE, Adafruit_MotorHAT.DOUBLE, Adafruit_MotorHAT.INTERLEAVE, Adafruit_MotorHAT.MICROSTEP]
 
 def stepper_worker(stepper, numsteps, direction, style):
-    #print("Steppin!")
     stepper.step(numsteps, direction, style)
-    #print("Done")
 
 while (True):
     if not st1.isAlive():
