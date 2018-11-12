@@ -8,39 +8,44 @@ import random
 
 class MotorOps(Adafruit_MotorHAT):
 
+    """
+    Summary: Inherits Motor specific functionality and acts as the brains while
+    instructing motors based on message received from alexa skill.
+
+    Params: message DICT - message containing action and curtain it pertains to
+
+    """
     def __init__(self, message):
         self.message = message
+        # Create a default object, no changes to I2C address or frequency
         Adafruit_MotorHAT.__init__(self)
+        # TODO: Ensure that this works like a teardown of the class
+        atexit.register(self.turnOffMotors)
+        # 200 steps/rev, motor port #1
+        self.leftStepper = super().getStepper(steps=200, num=1)
+        # 200 steps/rev, motor port #2
+        self.rightStepper = super().getStepper(steps=200, num=2)
+        self.leftStepper.setSpeed(rpm=60) # 60 rpm
+        self.rightStepper.setSpeed(rpm=60) # 60 rpm
 
-    def interpret_message():
+    def interpret_message(self):
         """
         Summary: Interprets the meaning of the message. Whether to power
         both motors, one motor, and the specific action on the curtain
         """
         pass
 
-# create a default object, no changes to I2C address or frequency
-mh = Adafruit_MotorHAT()
+    def turnOffMotors(self):
+        """
+        Summary: auto disables motors upon shutdown
+        """
+        #TODO: try with get stepper instead. Remove get motor if it works
+        super().getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+        super().getMotor(2).run(Adafruit_MotorHAT.RELEASE)
 
 # create empty threads (these will hold the stepper 1 and 2 threads)
 st1 = threading.Thread()
 st2 = threading.Thread()
-
-
-# recommended for auto-disabling motors on shutdown!
-def turnOffMotors():
-    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
-
-atexit.register(turnOffMotors)
-
-myStepper1 = mh.getStepper(200, 1)      # 200 steps/rev, motor port #1
-myStepper2 = mh.getStepper(200, 2)      # 200 steps/rev, motor port #1
-myStepper1.setSpeed(60)          # 30 RPM
-myStepper2.setSpeed(60)          # 30 RPM
-
 
 stepstyles = [Adafruit_MotorHAT.SINGLE, Adafruit_MotorHAT.DOUBLE, Adafruit_MotorHAT.INTERLEAVE, Adafruit_MotorHAT.MICROSTEP]
 
