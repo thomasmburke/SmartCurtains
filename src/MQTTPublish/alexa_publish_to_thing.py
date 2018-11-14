@@ -1,7 +1,7 @@
 import json
-import boto3
 import logging
 from dynamo_ops import DynamoOps
+from iot_ops import IoTOps
 from botocore.exceptions import ClientError
 
 # Initialize logger for CloudWatch logs
@@ -28,7 +28,7 @@ def alexa_publish_to_thing(event, context, filename='response_config.json'):
     return skillHandler.build_response(response=response)
 
 
-class SkillHandler(DynamoOps):
+class SkillHandler(DynamoOps, IoTOps):
     """
     Description: The SkillHandler class is used to inspect a JSON Request
     from an alexa skill and determine an appropriate response to send back.
@@ -45,6 +45,7 @@ class SkillHandler(DynamoOps):
         self.skillName = skillName
         DynamoOps.__init__(self, skillName=skillName)
         self.skillConfig = super().get_config()
+        IoTOps.__init__(self, iotConfig=self.skillConfig['iotConfig'])
 
     def handle_skill(self):
         """
@@ -67,27 +68,6 @@ class SkillHandler(DynamoOps):
         else:
             logging.info('Session Ended.')
             return self.stop()
-
-    def mqtt_message(self, curtainCmd, curtainDirection):
-        """
-        Description: Send MQTT message to raspberry pi
-
-        Return: TBD
-        """
-        # Initialize iot client to publish messages to a IoT thing
-        logger.info('connecting to iot-data module...')
-        client = boto3.client('iot-data', region_name='us-east-1')
-        # Set MQTT variables
-        topic = 'raspberrypi3'
-        QoS = 1
-        # Publish a MQTT message to a topic for our thing to ingest
-        logger.info('publishing MQTT message to topic: {}'.format(topic))
-        client.publish(
-            topic=topic,  # '$aws/things/pi/shadow/update',
-            qos=QoS,
-            payload=json.dumps({'command': curtainCmd,
-                'direction': curtainDirection})
-        )
 
     def launch_handler(self):
         """
@@ -145,7 +125,7 @@ class SkillHandler(DynamoOps):
             if curtainDirection in self.skillConfig['slots']['direction']:
                 curtainSpeech = 'left and right' if curtainDirection == 'both' else curtainDirection
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainCmd, curtainSpeech)
-                self.mqtt_message(curtainCmd=curtainCmd, curtainDirection=curtainDirection)
+                super().mqtt_message(curtainCmd=curtainCmd, curtainDirection=curtainDirection)
             # Invalid Direction Request
             elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['direction']:
                 logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
@@ -154,7 +134,7 @@ class SkillHandler(DynamoOps):
             else:
                 logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainCmd)
-                self.mqtt_message(curtainCmd=curtainCmd, curtainDirection='both')
+                super().mqtt_message(curtainCmd=curtainCmd, curtainDirection='both')
         # Invalid Status Request
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
@@ -265,6 +245,6 @@ class SkillHandler(DynamoOps):
         return card
 
 if __name__=='__main__':
-    with open('nodirection_status_intent.json') as intentRequest:
+    with open('direction_status_intent.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_publish_to_thing(event=event, context=None))
