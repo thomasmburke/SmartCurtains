@@ -59,7 +59,7 @@
         },
         "iotConfig": {
             "topic": "raspberrypi3",
-            "QoS": "1"
+            "QoS": 1
         }
         },
         {
