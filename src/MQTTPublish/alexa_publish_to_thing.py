@@ -164,7 +164,7 @@ class SkillHandler(DynamoOps):
     def insert_into_response(self, response, *responseInputs):
         """
         Summary: takes in a response dictionary and inserts skill specific
-        inputs
+        inputs if value is a string
 
         Params: response DICT - this is the response to be modified
             *responseInputs LIST - this is the list of inputs to be inserted
