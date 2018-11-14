@@ -193,9 +193,8 @@ class SkillHandler(DynamoOps):
         Return: DICT - assistanceResponse gathered from response_config.json with curtain commands
         """
         logger.info('assistance method was called due to user saying HELP')
-        assistanceResponse = self.skillConfig['responses']['assistanceResponse']
-        for k, v in assistanceResponse.items():
-            assistanceResponse[k] = v.format(','.join(map(str, self.skillConfig['slots']['status']))) if isinstance(v, str) else v
+        assistanceResponse = self.insert_into_response(self.skillConfig['responses']['assistanceResponse'],
+                ', '.join(self.skillConfig['slots']['status']))
         return assistanceResponse
 
     def fallback(self):
