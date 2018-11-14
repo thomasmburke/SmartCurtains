@@ -56,6 +56,10 @@
         "slots": {
             "status": ["open","close","shut"],
             "direction":["left","right","both"]
+        },
+        "iotConfig": {
+            "topic": "raspberrypi3",
+            "QoS": "1"
         }
         },
         {
