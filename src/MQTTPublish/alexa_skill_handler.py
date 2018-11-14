@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def alexa_publish_to_thing(event, context, filename='response_config.json'):
+def alexa_skill_handler(event, context):
     """
     Description: This is lambda's handler function that will leverage the
     SkillHandler class to interpret a request from alexa and return the 
@@ -247,4 +247,4 @@ class SkillHandler(DynamoOps, IoTOps):
 if __name__=='__main__':
     with open('direction_status_intent.json') as intentRequest:
         event = json.load(intentRequest)
-    print(alexa_publish_to_thing(event=event, context=None))
+    print(alexa_skill_handler(event=event, context=None))
