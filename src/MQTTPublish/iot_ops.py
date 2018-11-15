@@ -26,15 +26,37 @@ class IoTOps:
 
     def mqtt_message(self, curtainCmd, curtainDirection):
         """                                                                        
-        Description: Send MQTT message to raspberry pi                             
+        Description: Send MQTT message to raspberry pi                            
                                                                                    
-        Return: TBD                                                                
-        """                                                                        
-        # Publish a MQTT message to a topic for our thing to ingest                
-        logger.info('publishing MQTT message to topic: {}'.format(self.topic))          
-        self.iotClient.publish(                                                            
-            topic=self.topic,  # '$aws/things/pi/shadow/update',                        
+        Return: TBD                                                              
+        """                                                                       
+        # Publish a MQTT message to a topic for our thing to ingest               
+        logger.info('publishing MQTT message to topic: {}'.format(self.topic))         
+        self.iotClient.publish(                                                           
+            topic=self.topic,  # '$aws/things/pi/shadow/update',                       
             qos=self.QoS,                                                               
-            payload=json.dumps({'command': curtainCmd,                             
-                'direction': curtainDirection})                                    
-        )   
+            payload=json.dumps({'command': curtainCmd,                            
+                'direction': curtainDirection})                                   
+        )  
+
+    def update_shadow(self):
+        """
+        Summary:
+        """
+        pass
+
+    def get_shadow(self):
+        """
+        Summary:
+        """
+        pass
+
+    def delete_shadow(self):
+        """
+        Summary:
+        """
+        pass
+
+# TODO:
+# Need a Subscription to the reject shadow topic in case of failure
+# $aws/things/pi/shadow/update/rejected
