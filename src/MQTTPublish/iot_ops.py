@@ -124,7 +124,8 @@ class IoTOps:
         response = self.iotClient.get_thing_shadow(
             thingName=self.thingName
         )
-        return response['payload'].read().decode('utf-8')
+        response = json.loads(response['payload'].read().decode('utf-8'))['state']['desired']
+        return response
 
     def delete_shadow(self):
         """
@@ -143,8 +144,7 @@ class IoTOps:
 
         Return The state information in a JSON format
         """
-        # payload = {'state': {'desired':{'left': 1, 'right': 1}}}
-        payload = {'left': 2, 'right': 3}
+        payload = {'left': 1, 'right': 1}
         self.update_shadow(payload=payload)
 
 # TODO:
