@@ -59,7 +59,12 @@
         },
         "iotConfig": {
             "topic": "raspberrypi3",
-            "QoS": 1
+            "QoS": 1,
+            "thingName": "pi"
+        },
+        "commands": {
+            "openCommands": ["open"],
+            "closeCommands": ["close","shut"]
         }
         },
         {

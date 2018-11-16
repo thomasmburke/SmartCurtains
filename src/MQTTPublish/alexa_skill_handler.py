@@ -125,7 +125,8 @@ class SkillHandler(DynamoOps, IoTOps):
             if curtainDirection in self.skillConfig['slots']['direction']:
                 curtainSpeech = 'left and right' if curtainDirection == 'both' else curtainDirection
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainCmd, curtainSpeech)
-                super().mqtt_message(curtainCmd=curtainCmd, curtainDirection=curtainDirection)
+                curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
+                super().publish_mqtt_message(status=curtainCmd, direction=curtainDirection)
             # Invalid Direction Request
             elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['direction']:
                 logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
@@ -134,7 +135,8 @@ class SkillHandler(DynamoOps, IoTOps):
             else:
                 logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainCmd)
-                super().mqtt_message(curtainCmd=curtainCmd, curtainDirection='both')
+                curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
+                super().publish_mqtt_message(status=curtainCmd, direction='both')
         # Invalid Status Request
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
