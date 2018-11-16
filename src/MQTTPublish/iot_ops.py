@@ -108,9 +108,10 @@ class IoTOps:
 
         Return The state information in a JSON format
         """
+        updatedPayload = {'state': {'desired': payload}}
         response = self.iotClient.update_thing_shadow(
             thingName=self.thingName,
-            payload=json.dumps(payload)
+            payload=json.dumps(updatedPayload)
         )
         return response
 
@@ -123,7 +124,7 @@ class IoTOps:
         response = self.iotClient.get_thing_shadow(
             thingName=self.thingName
         )
-        return response
+        return response['payload'].read().decode('utf-8')
 
     def delete_shadow(self):
         """
@@ -136,16 +137,22 @@ class IoTOps:
         )
         return response
 
-
     def initialize_shadow(self):
         """
         Summary: Sets shadow of curtains back to fully closed
 
         Return The state information in a JSON format
         """
-        payload = {'left': 1, 'right': 1}
+        # payload = {'state': {'desired':{'left': 1, 'right': 1}}}
+        payload = {'left': 2, 'right': 3}
         self.update_shadow(payload=payload)
 
 # TODO:
 # Need a Subscription to the reject shadow topic in case of failure
 # $aws/things/pi/shadow/update/rejected
+
+if __name__=='__main__':
+    iotConfig = {'thingName': 'pi', 'topic': 'raspberrypi3', 'QoS': 1}
+    # print(IoTOps(iotConfig=iotConfig).delete_shadow())
+    print(IoTOps(iotConfig=iotConfig).initialize_shadow())
+    print(IoTOps(iotConfig=iotConfig).get_shadow())
