@@ -136,6 +136,16 @@ class IoTOps:
         )
         return response
 
+
+    def initialize_shadow(self):
+        """
+        Summary: Sets shadow of curtains back to fully closed
+
+        Return The state information in a JSON format
+        """
+        payload = {'left': 1, 'right': 1}
+        self.update_shadow(payload=payload)
+
 # TODO:
 # Need a Subscription to the reject shadow topic in case of failure
 # $aws/things/pi/shadow/update/rejected
