@@ -54,13 +54,13 @@
             }
         },
         "slots": {
-            "status": ["open","close","shut"],
-            "direction":["left","right","both"]
+            "curtainAction": ["open","close","shut"],
+            "specifiedCurtain":["left","right","both"]
         },
         "iotConfig": {
             "topic": "raspberrypi3",
             "QoS": 1,
-            "thingName": "pi"
+            "thingName": "raspberrypi"
         },
         "commands": {
             "openCommands": ["open"],

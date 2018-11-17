@@ -108,7 +108,7 @@ class SkillHandler(DynamoOps, IoTOps):
 
     def curtain_control(self):
         """
-        Description: Analyze intent response. If valid slot value for -status- is 
+        Description: Analyze intent response. If valid slot value for -curtainAction- is 
         given then an appropriate MQTT message will be sent to the associated AWS
         IoT thing. If invalid value is given the user will be prompted to try 
         another action phrase.
@@ -117,18 +117,18 @@ class SkillHandler(DynamoOps, IoTOps):
         based on whether or not the command was valid
         """
         # Retrieve the curtain command supplied by the end user
-        curtainCmd = self.event['request']['intent']['slots']['status']['value']
-        curtainDirection = self.event['request']['intent']['slots']['direction'].get('value')
+        curtainCmd = self.event['request']['intent']['slots']['curtainAction']['value']
+        curtainDirection = self.event['request']['intent']['slots']['specifiedCurtain'].get('value')
         # Check to see if user supplied curtain command is in valid command list
-        if curtainCmd in self.skillConfig['slots']['status']:
+        if curtainCmd in self.skillConfig['slots']['curtainAction']:
             # Valid Status and Direction Request
-            if curtainDirection in self.skillConfig['slots']['direction']:
+            if curtainDirection in self.skillConfig['slots']['specifiedCurtain']:
                 curtainSpeech = 'left and right' if curtainDirection == 'both' else curtainDirection
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainCmd, curtainSpeech)
                 curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().check_thing_state(status=curtainCmd, direction=curtainDirection, percentage=None)
+                super().check_thing_state(curtainAction=curtainCmd, specifiedCurtain=curtainDirection, deltaPercentage=None)
             # Invalid Direction Request
-            elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['direction']:
+            elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['specifiedCurtain']:
                 logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['invalidIntentResponse'], curtainDirection)
             # Valid Status Request
@@ -136,7 +136,7 @@ class SkillHandler(DynamoOps, IoTOps):
                 logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainCmd)
                 curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().check_thing_state(status=curtainCmd, direction='both', percentage=None)
+                super().check_thing_state(curtainAction=curtainCmd, specifiedCurtain='both', deltaPercentage=None)
         # Invalid Status Request
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
@@ -176,7 +176,7 @@ class SkillHandler(DynamoOps, IoTOps):
         """
         logger.info('assistance method was called due to user saying HELP')
         assistanceResponse = self.insert_into_response(self.skillConfig['responses']['assistanceResponse'],
-                ', '.join(self.skillConfig['slots']['status']))
+                ', '.join(self.skillConfig['slots']['curtainAction']))
         return assistanceResponse
 
     def fallback(self):
@@ -247,6 +247,6 @@ class SkillHandler(DynamoOps, IoTOps):
         return card
 
 if __name__=='__main__':
-    with open('nodirection_status_intent.json') as intentRequest:
+    with open('nospecifiedCurtain_curtainAction_intent.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_skill_handler(event=event, context=None))

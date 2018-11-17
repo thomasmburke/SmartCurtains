@@ -9,8 +9,8 @@ logger.setLevel(logging.INFO)
 
 class IoTOps:
     """
-    Summary: Designed to check current status of thing by leveraging the
-    thing's shadow. Using the input command and direction it will determine If
+    Summary: Designed to check current curtainAction of thing by leveraging the
+    thing's shadow. Using the input command and specifiedCurtain it will determine If
     it is a viable option and send a MQTT message to the thing
 
     Params: iotClient boto3 clientused to update thing's shadow and also send 
@@ -37,17 +37,17 @@ class IoTOps:
         """
         shadow = self.get_shadow()
         # gather action supplied by alexa command
-        action = payloadInputs['status']
+        action = payloadInputs['curtainAction']
         # Generate dictionary to be published to mqtt topic
         mqttPayload = {}
         # Map Open to value 0 and close to value 1
         curtainEndValue = 0 if action == 'open' else 1
         # Get percent from alexa command
-        commandPerc = payloadInputs['percentage']
-        # Depending on direction get entire shadow or only the curtain specified
-        curtainsToCheck = ['left', 'right'] if payloadInputs['direction'] == 'both' else [payloadInputs['direction']]
+        deltaPercentage = payloadInputs['deltaPercentage']
+        # Depending on specifiedCurtain get entire shadow or only the curtain specified
+        curtainsToCheck = ['left', 'right'] if payloadInputs['specifiedCurtain'] == 'both' else [payloadInputs['specifiedCurtain']]
         # if a percentage is specified perform a calculation
-        if commandPerc:
+        if deltaPercentage:
             # iterate through each of the curtains states
             for curtainToCheck in curtainsToCheck:
                 # Get current percent from shadow
@@ -55,20 +55,20 @@ class IoTOps:
                 # Check to see if they are trying to open a fully open curtain or close a fully closed curtain
                 if currentThingPerc == curtainEndValue:
                     continue
-                # See if percentage goes past limits based on payload status
-                totalPerc = (currentThingPerc - commandPerc) if action == 'open' else (currentThingPerc + commandPerc)
+                # See if percentage goes past limits based on payload curtainAction
+                totalPerc = (currentThingPerc - deltaPercentage) if action == 'open' else (currentThingPerc + deltaPercentage)
                 if totalPerc > 1 or totalPerc < 0:
                     # Percentage is past 100% or 0% so we must calculate the delta
-                    deltaPerc = currentThingPerc if action == 'open' else (1 - currentThingPerc)
+                    finalPerc = currentThingPerc if action == 'open' else (1 - currentThingPerc)
                     # Update Shadow to max/min value
                     shadow[curtainToCheck] = curtainEndValue
                 else:
                     # if command is within limits proceed with that percentage
-                    deltaPerc = commandPerc
+                    finalPerc = deltaPercentage
                     # Update shadow with new delta added
                     shadow[curtainToCheck] = totalPerc
                 # Update mqttpayload for action to take place
-                mqttPayload[curtainToCheck] = {'action': action, 'percentage': deltaPerc}
+                mqttPayload[curtainToCheck] = {'action': action, 'percentage': finalPerc}
         # If no percentage is specified it defaults to a full open or close
         else:
             for curtainToCheck in curtainsToCheck:
@@ -77,11 +77,11 @@ class IoTOps:
                 # Check to see if they are trying to open a fully open curtain or close a fully closed curtain
                 if currentThingPerc == curtainEndValue:
                     continue
-                deltaPerc = currentThingPerc if action == 'open' else (1 - currentThingPerc)
+                finalPerc = currentThingPerc if action == 'open' else (1 - currentThingPerc)
                 # Update Shadow to max/min value
                 shadow[curtainToCheck] = curtainEndValue
                 # Update mqttpayload for action to take place
-                mqttPayload[curtainToCheck] = {'action': action, 'percentage': deltaPerc}
+                mqttPayload[curtainToCheck] = {'action': action, 'percentage': finalPerc}
         if mqttPayload:
             self.publish_mqtt_message(payload=mqttPayload)
             self.update_shadow(payload=shadow)
