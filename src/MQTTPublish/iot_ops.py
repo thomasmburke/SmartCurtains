@@ -41,7 +41,7 @@ class IoTOps:
         # Generate dictionary to be published to mqtt topic
         mqttPayload = {}
         # Map Open to value 0 and close to value 1
-        cutainEndValue = 0 if action == 'open' else 1
+        curtainEndValue = 0 if action == 'open' else 1
         # Get percent from alexa command
         commandPerc = payloadInputs['percentage']
         # Depending on direction get entire shadow or only the curtain specified
@@ -66,9 +66,9 @@ class IoTOps:
                     # if command is within limits proceed with that percentage
                     deltaPerc = commandPerc
                     # Update shadow with new delta added
-                    shadow[curtainsToCheck] = totalPerc
+                    shadow[curtainToCheck] = totalPerc
                 # Update mqttpayload for action to take place
-                mqttPayload[curtainsToCheck] = {'action': action, 'percentage': deltaPerc}
+                mqttPayload[curtainToCheck] = {'action': action, 'percentage': deltaPerc}
         # If no percentage is specified it defaults to a full open or close
         else:
             for curtainToCheck in curtainsToCheck:
@@ -81,10 +81,10 @@ class IoTOps:
                 # Update Shadow to max/min value
                 shadow[curtainToCheck] = curtainEndValue
                 # Update mqttpayload for action to take place
-                mqttPayload[curtainsToCheck] = {'action': action, 'percentage': deltaPerc}
+                mqttPayload[curtainToCheck] = {'action': action, 'percentage': deltaPerc}
         if mqttPayload:
             self.publish_mqtt_message(payload=mqttPayload)
-            self.update_shadow(payload=shadow['state'])
+            self.update_shadow(payload=shadow)
         return mqttPayload
 
     def publish_mqtt_message(self, payload):

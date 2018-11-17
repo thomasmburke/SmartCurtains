@@ -126,7 +126,7 @@ class SkillHandler(DynamoOps, IoTOps):
                 curtainSpeech = 'left and right' if curtainDirection == 'both' else curtainDirection
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainCmd, curtainSpeech)
                 curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().publish_mqtt_message(status=curtainCmd, direction=curtainDirection)
+                super().check_thing_state(status=curtainCmd, direction=curtainDirection, percentage=None)
             # Invalid Direction Request
             elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['direction']:
                 logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
@@ -136,7 +136,7 @@ class SkillHandler(DynamoOps, IoTOps):
                 logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainCmd)
                 curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().publish_mqtt_message(status=curtainCmd, direction='both')
+                super().check_thing_state(status=curtainCmd, direction='both', percentage=None)
         # Invalid Status Request
         else:
             logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
@@ -247,6 +247,6 @@ class SkillHandler(DynamoOps, IoTOps):
         return card
 
 if __name__=='__main__':
-    with open('direction_status_intent.json') as intentRequest:
+    with open('nodirection_status_intent.json') as intentRequest:
         event = json.load(intentRequest)
     print(alexa_skill_handler(event=event, context=None))
