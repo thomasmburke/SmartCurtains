@@ -48,6 +48,8 @@ class IoTOps:
         curtainsToCheck = ['left', 'right'] if payloadInputs['specifiedCurtain'] == 'both' else [payloadInputs['specifiedCurtain']]
         # if a percentage is specified perform a calculation
         if deltaPercentage:
+            # Cast deltapercentage to an float
+            deltaPercentage = float(deltaPercentage)/100
             # iterate through each of the curtains states
             for curtainToCheck in curtainsToCheck:
                 # Get current percent from shadow
