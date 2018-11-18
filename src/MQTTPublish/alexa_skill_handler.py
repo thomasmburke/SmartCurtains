@@ -117,30 +117,30 @@ class SkillHandler(DynamoOps, IoTOps):
         based on whether or not the command was valid
         """
         # Retrieve the curtain command supplied by the end user
-        curtainCmd = self.event['request']['intent']['slots']['curtainAction']['value']
-        curtainDirection = self.event['request']['intent']['slots']['specifiedCurtain'].get('value')
+        curtainAction = self.event['request']['intent']['slots']['curtainAction'].get('value')
+        specifiedCurtain = self.event['request']['intent']['slots']['specifiedCurtain'].get('value')
         # Check to see if user supplied curtain command is in valid command list
-        if curtainCmd in self.skillConfig['slots']['curtainAction']:
-            # Valid Status and Direction Request
-            if curtainDirection in self.skillConfig['slots']['specifiedCurtain']:
-                curtainSpeech = 'left and right' if curtainDirection == 'both' else curtainDirection
-                curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainCmd, curtainSpeech)
-                curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().check_thing_state(curtainAction=curtainCmd, specifiedCurtain=curtainDirection, deltaPercentage=None)
-            # Invalid Direction Request
-            elif curtainDirection is not None and curtainDirection not in self.skillConfig['slots']['specifiedCurtain']:
-                logger.info('curtain command: {} supplied by end user is invalid'.format(curtainDirection))
-                curtainResponse = self.insert_into_response(self.skillConfig['responses']['invalidIntentResponse'], curtainDirection)
-            # Valid Status Request
+        if curtainAction in self.skillConfig['slots']['curtainAction']:
+            # Valid curtainAction and specifiedCurtain Request
+            if specifiedCurtain in self.skillConfig['slots']['specifiedCurtain']:
+                curtainSpeech = 'left and right' if specifiedCurtain == 'both' else specifiedCurtain
+                curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainAction, curtainSpeech)
+                curtainAction = 'open' if curtainAction in self.skillConfig['commands']['openCommands'] else 'close'
+                super().check_thing_state(curtainAction=curtainAction, specifiedCurtain=specifiedCurtain, deltaPercentage=None)
+            # Invalid specifiedCurtain Request
+            elif specifiedCurtain is not None and specifiedCurtain not in self.skillConfig['slots']['specifiedCurtain']:
+                logger.info('curtain command: {} supplied by end user is invalid'.format(specifiedCurtain))
+                curtainResponse = self.insert_into_response(self.skillConfig['responses']['invalidIntentResponse'], specifiedCurtain)
+            # Valid curtainAction Request
             else:
-                logger.info('curtain command: {} supplied by end user is valid'.format(curtainCmd))
-                curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainCmd)
-                curtainCmd = 'open' if curtainCmd in self.skillConfig['commands']['openCommands'] else 'close'
-                super().check_thing_state(curtainAction=curtainCmd, specifiedCurtain='both', deltaPercentage=None)
-        # Invalid Status Request
+                logger.info('curtain command: {} supplied by end user is valid'.format(curtainAction))
+                curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusIntentResponse'], curtainAction)
+                curtainAction = 'open' if curtainAction in self.skillConfig['commands']['openCommands'] else 'close'
+                super().check_thing_state(curtainAction=curtainAction, specifiedCurtain='both', deltaPercentage=None)
+        # Invalid curtainAction Request
         else:
-            logger.info('curtain command: {} supplied by end user is invalid'.format(curtainCmd))
-            curtainResponse = self.insert_into_response(self.skillConfig['responses']['invalidIntentResponse'], curtainCmd)
+            logger.info('curtain command: {} supplied by end user is invalid'.format(curtainAction))
+            curtainResponse = self.insert_into_response(self.skillConfig['responses']['invalidIntentResponse'], curtainAction)
         return curtainResponse
 
     def insert_into_response(self, response, *responseInputs):
