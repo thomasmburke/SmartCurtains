@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "raspberry pi",
+            "invocationName": "curtain control",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
@@ -27,26 +27,35 @@
                     "name": "CurtainControl",
                     "slots": [
                         {
-                            "name": "status",
-                            "type": "status"
+                            "name": "curtainAction",
+                            "type": "curtainAction"
                         },
                         {
-                            "name": "direction",
-                            "type": "direction"
+                            "name": "specifiedCurtain",
+                            "type": "specifiedCurtain"
+                        },
+                        {
+                            "name": "deltaPercentage",
+                            "type": "AMAZON.NUMBER"
                         }
                     ],
                     "samples": [
-                        "{status} the {direction} curtain",
-                        "{status} {direction} the curtains",
-                        "to {status} the {direction} curtain",
-                        "{status} the curtains",
-                        "to {status} the curtains"
+                        "{curtainAction} {specifiedCurtain} the curtains {deltaPercentage} percent",
+                        "{curtainAction} the curtains {deltaPercentage} percent",
+                        "to {curtainAction} the curtains {deltaPercentage} percent",
+                        "{curtainAction} the {specifiedCurtain} curtain {deltaPercentage} percent",
+                        "to {curtainAction} the {specifiedCurtain} curtain  {deltaPercentage} percent",
+                        "{curtainAction} the {specifiedCurtain} curtain",
+                        "{curtainAction} {specifiedCurtain} the curtains",
+                        "to {curtainAction} the {specifiedCurtain} curtain",
+                        "{curtainAction} the curtains",
+                        "to {curtainAction} the curtains"
                     ]
                 }
             ],
             "types": [
                 {
-                    "name": "status",
+                    "name": "curtainAction",
                     "values": [
                         {
                             "name": {
@@ -66,7 +75,7 @@
                     ]
                 },
                 {
-                    "name": "direction",
+                    "name": "specifiedCurtain",
                     "values": [
                         {
                             "name": {
