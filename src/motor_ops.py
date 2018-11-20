@@ -1,7 +1,12 @@
 #!/usr/bin/python
-from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor, Adafruit_StepperMotor
+from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_StepperMotor
 import atexit
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.INFO)
 
 
 class MotorOps(Adafruit_MotorHAT):
@@ -13,7 +18,7 @@ class MotorOps(Adafruit_MotorHAT):
     Params: message DICT - message containing action and curtain it pertains to
 
     """
-    MAX_STEPS = 200
+    MAX_STEPS = 2000000
 
     def __init__(self, message):
         self.message = message
@@ -25,27 +30,32 @@ class MotorOps(Adafruit_MotorHAT):
         self.leftStepper = super().getStepper(steps=200, num=1)
         # 200 steps/rev, motor port #2
         self.rightStepper = super().getStepper(steps=200, num=2)
-        self.leftStepper.setSpeed(rpm=60) # 60 rpm
-        self.rightStepper.setSpeed(rpm=60) # 60 rpm
+        self.leftStepper.setSpeed(rpm=6000) # rpm
+        self.rightStepper.setSpeed(rpm=6000) # rpm
 
     def interpret_message(self):
         """
         Summary: Interprets the meaning of the message. Whether to power
-        both motors, one motor, and the specific action on the curtain
+        both motors, one motor, and the specific action on the curtain along
+        with the percentage of the action
         """
-        # If neither cutain is specified then operate on both
-#        if not self.message['direction'] or self.message['direction'] == 'both':
-            # TODO: see if we can use super() below
-        leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, self.MAX_STEPS, self.FORWARD, Adafruit_MotorHAT.SINGLE))
-        rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, self.MAX_STEPS, super().FORWARD, Adafruit_MotorHAT.SINGLE))
-        leftStepperThread.start()
-        rightStepperThread.start()
+        if 'left' in self.message:
+            numSteps = int(self.MAX_STEPS * float(self.message['left']['percentage']))
+            direction = self.FORWARD if self.message['left']['action'] == 'open' else self.BACKWARD
+            logger.info('Left Motor - numSteps={0}, direction={1}'.format(numSteps,direction))
+            leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, numSteps, direction, self.SINGLE))
+            leftStepperThread.start()
+        if 'right' in self.message:
+            numSteps = self.MAX_STEPS * int(self.message['right']['percentage'])
+            direction = self.FORWARD if self.message['right']['action'] == 'open' else self.BACKWARD
+            logger.info('Right Motor - numSteps={0}, direction={1}'.format(numSteps,direction))
+            rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, numSteps, direction, self.SINGLE))
+            rightStepperThread.start()
 
     def turnOffMotors(self):
         """
         Summary: auto disables motors upon shutdown
         """
-        #TODO: try with get stepper instead. Remove get motor if it works
         super().getMotor(1).run(Adafruit_MotorHAT.RELEASE)
         super().getMotor(2).run(Adafruit_MotorHAT.RELEASE)
 
@@ -53,4 +63,4 @@ class MotorOps(Adafruit_MotorHAT):
         stepper.step(numsteps, direction, style)
 
 if __name__=='__main__':
-    MotorOps(message={'left': 0.5, 'right': 0.5}).interpret_message()
+    MotorOps(message={'left': {'percentage':0.5, 'action': 'open'}, 'right': {'percentage':0.1, 'action': 'close'}}).interpret_message()
