@@ -34,12 +34,12 @@ class MotorOps(Adafruit_MotorHAT):
         both motors, one motor, and the specific action on the curtain
         """
         # If neither cutain is specified then operate on both
-        if not self.message['direction'] or self.message['direction'] == 'both':
+#        if not self.message['direction'] or self.message['direction'] == 'both':
             # TODO: see if we can use super() below
-            leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, self.MAX_STEPS, self.FORWARD, Adafruit_MotorHAT.SINGLE))
-            rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, self.MAX_STEPS, super().FORWARD, Adafruit_MotorHAT.SINGLE))
-            leftStepperThread.start()
-            rightStepperThread.start()
+        leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, self.MAX_STEPS, self.FORWARD, Adafruit_MotorHAT.SINGLE))
+        rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, self.MAX_STEPS, super().FORWARD, Adafruit_MotorHAT.SINGLE))
+        leftStepperThread.start()
+        rightStepperThread.start()
 
     def turnOffMotors(self):
         """
@@ -51,3 +51,6 @@ class MotorOps(Adafruit_MotorHAT):
 
     def stepper_worker(self, stepper, numsteps, direction, style):
         stepper.step(numsteps, direction, style)
+
+if __name__=='__main__':
+    MotorOps(message={'left': 0.5, 'right': 0.5}).interpret_message()
