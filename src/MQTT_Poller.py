@@ -54,6 +54,7 @@ class MQTTPoller:
         #     ESTABLISH CONNECTION      #
         #                               #
         #################################
+        logger.info('initiating MQTT connection...')
         myMQTTClient.connect()
         # Subscribe to topic that the alexa lambda function is publishing to
         logging.info('subscribing to topic...')
