@@ -1,7 +1,14 @@
 # Import SDK packages
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+from motor_ops import MotorOps
 import os
+import logging
 import json
+
+# Initialize logger
+logger = logging.getLogger(__name__)                                               
+logger.addHandler(logging.StreamHandler())                                         
+logger.setLevel(logging.INFO
 
 class MQTTPoller:
 
@@ -34,6 +41,7 @@ class MQTTPoller:
         myMQTTClient = AWSIoTMQTTClient("raspberrypi")
         # Configurations
         # For TLS mutual authentication
+        logger.info('configuring connection...')
         myMQTTClient.configureEndpoint(hostName=self.iotEndpoint, portNumber=self.MQTT_PORT)
         myMQTTClient.configureCredentials(CAFilePath=self.rootCA, KeyPath=self.privKey, CertificatePath=self.iotCert)
         myMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
@@ -48,21 +56,16 @@ class MQTTPoller:
         #################################
         myMQTTClient.connect()
         # Subscribe to topic that the alexa lambda function is publishing to
+        logging.info('subscribing to topic...')
         myMQTTClient.subscribe(topic="raspberrypi3", QoS=0, callback=self.customCallback)
         while True:
             pass
 
 
     # Custom MQTT message callback
-    def customCallback(self,client, userdata, message):
-        print("Received a new message: ")
-        print(message.payload)
-        print("from topic: ")
-        print(message.topic)
-        print("--------------\n\n")
-        if message.payload == 'open':
-            print('received message and ready for action')
-
+    def customCallback(self, client, userdata, message):
+        logger.info('calling MotorOps with the following message {}'.format(message))
+        MotorOps(message=message).interpret_message()
 
 if __name__ == '__main__':
     MQTTPoller().poll_mqtt_messages()
