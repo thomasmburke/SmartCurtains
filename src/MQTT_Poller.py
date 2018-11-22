@@ -12,6 +12,8 @@ logger.setLevel(logging.INFO)
 
 class MQTTPoller:
 
+    semaphore = True
+
     def __init__(self):
         #################################
         #                               #
@@ -66,7 +68,13 @@ class MQTTPoller:
     # Custom MQTT message callback
     def customCallback(self, client, userdata, message):
         logger.info('calling MotorOps with the following message {}'.format(message.payload))
-        MotorOps(message=json.loads(message.payload.decode('utf-8'))).interpret_message()
+        # import pdb; pdb.set_trace()
+        messageDict = json.loads(message.payload.decode('utf-8'))
+        if self.semaphore:
+            print(messageDict)
+            MotorOps(message=messageDict).interpret_message()
+            self.semaphore = False
+        return
 
 if __name__ == '__main__':
     MQTTPoller().poll_mqtt_messages()
