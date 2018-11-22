@@ -65,8 +65,8 @@ class MQTTPoller:
 
     # Custom MQTT message callback
     def customCallback(self, client, userdata, message):
-        logger.info('calling MotorOps with the following message {}'.format(message))
-        MotorOps(message=message).interpret_message()
+        logger.info('calling MotorOps with the following message {}'.format(message.payload))
+        MotorOps(message=json.loads(message.payload.decode('utf-8'))).interpret_message()
 
 if __name__ == '__main__':
     MQTTPoller().poll_mqtt_messages()
