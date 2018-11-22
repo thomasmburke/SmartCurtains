@@ -24,7 +24,6 @@ class MotorOps(Adafruit_MotorHAT):
         self.message = message
         # Create a default object, no changes to I2C address or frequency
         Adafruit_MotorHAT.__init__(self)
-        # TODO: Ensure that this works like a teardown of the class
         atexit.register(self.turnOffMotors)
         # 200 steps/rev, motor port #1
         self.leftStepper = super().getStepper(steps=200, num=1)
