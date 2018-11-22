@@ -46,7 +46,7 @@ class MotorOps(Adafruit_MotorHAT):
             leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, numSteps, direction, self.SINGLE))
             leftStepperThread.start()
         if 'right' in self.message:
-            numSteps = self.MAX_STEPS * int(self.message['right']['percentage'])
+            numSteps = int(self.MAX_STEPS * float(self.message['right']['percentage']))
             direction = self.FORWARD if self.message['right']['action'] == 'open' else self.BACKWARD
             logger.info('Right Motor - numSteps={0}, direction={1}'.format(numSteps,direction))
             rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, numSteps, direction, self.SINGLE))
@@ -63,4 +63,4 @@ class MotorOps(Adafruit_MotorHAT):
         stepper.step(numsteps, direction, style)
 
 if __name__=='__main__':
-    MotorOps(message={'left': {'percentage':0.5, 'action': 'open'}, 'right': {'percentage':0.1, 'action': 'close'}}).interpret_message()
+    MotorOps(message={'left': {'percentage':0.5, 'action': 'open'}, 'right': {'percentage':0.5, 'action': 'close'}}).interpret_message()
