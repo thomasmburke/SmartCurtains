@@ -4,6 +4,7 @@ from motor_ops import MotorOps
 import os
 import logging
 import json
+import time
 
 # Initialize logger
 logger = logging.getLogger(__name__)                                               
@@ -11,8 +12,6 @@ logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 class MQTTPoller:
-
-    semaphore = True
 
     def __init__(self):
         #################################
@@ -62,18 +61,16 @@ class MQTTPoller:
         logging.info('subscribing to topic...')
         myMQTTClient.subscribe(topic="raspberrypi3", QoS=0, callback=self.customCallback)
         while True:
-            pass
-
+            # Stop constant polling of threads for smoother motor movement
+            time.sleep(0.1)
 
     # Custom MQTT message callback
     def customCallback(self, client, userdata, message):
         logger.info('calling MotorOps with the following message {}'.format(message.payload))
-        # import pdb; pdb.set_trace()
+        # Create Dictionary to evaluate in motor ops
         messageDict = json.loads(message.payload.decode('utf-8'))
-        if self.semaphore:
-            print(messageDict)
-            MotorOps(message=messageDict).interpret_message()
-            self.semaphore = False
+        # Operate motors
+        MotorOps(message=messageDict).interpret_message()
         return
 
 if __name__ == '__main__':
