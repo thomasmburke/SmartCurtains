@@ -1,0 +1,4 @@
+# Run MQTT Poller on boot
+# sleep to allow for internet connection
+sleep 15
+sudo python3 /home/pi/smarthome/src/MQTT_Poller.py & > /home/pi/poller.txt 2>&1
