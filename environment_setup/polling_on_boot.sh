@@ -1,3 +1,7 @@
+rclocal="/etc/rc.local"
+# Remove existing exit 0 from rc.local and append bootstrap process
+awk '{gsub("exit 0", "");print}' $rclocal
+cat >> $rclocal <<EOF
 # Run MQTT Poller on boot
 counter=0
 while ! /sbin/ifconfig wlan0 | grep -q 'inet addr:[0-9]'; do
@@ -13,3 +17,4 @@ while ! /sbin/ifconfig wlan0 | grep -q 'inet addr:[0-9]'; do
 sudo python3 /home/pi/smarthome/src/MQTT_Poller.py & > /home/pi/poller.txt 2>&1
 
 exit 0
+EOF
