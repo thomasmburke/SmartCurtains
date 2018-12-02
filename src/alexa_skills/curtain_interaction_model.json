@@ -37,9 +37,17 @@
                         {
                             "name": "deltaPercentage",
                             "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "curtainReset",
+                            "type": "curtainReset"
                         }
                     ],
                     "samples": [
+                        "to {curtainReset} curtains to {curtainAction}",
+                        "to {curtainReset} curtain to {curtainAction}",
+                        "to {curtainReset} to {curtainAction}",
+                        "to {curtainAction}",
                         "{curtainAction} {specifiedCurtain} the curtains {deltaPercentage} percent",
                         "{curtainAction} the curtains {deltaPercentage} percent",
                         "to {curtainAction} the curtains {deltaPercentage} percent",
@@ -90,6 +98,16 @@
                         {
                             "name": {
                                 "value": "left"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "curtainReset",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "reset"
                             }
                         }
                     ]

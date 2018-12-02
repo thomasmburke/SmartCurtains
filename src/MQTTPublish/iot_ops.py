@@ -140,21 +140,22 @@ class IoTOps:
         )
         return response
 
-    def initialize_shadow(self):
+    def reset_shadow(self, curtainAction):
         """
         Summary: Sets shadow of curtains back to fully closed
 
         Return The state information in a JSON format
         """
-        payload = {'left': 1, 'right': 1}
+        curtainEndValue = 0 if curtainAction == 'open' else 1
+        payload = {'left': curtainEndValue, 'right': curtainEndValue}
         self.update_shadow(payload=payload)
 
 # TODO:
 # Need a Subscription to the reject shadow topic in case of failure
 # $aws/things/pi/shadow/update/rejected
 
-if __name__=='__main__':
-    iotConfig = {'thingName': 'pi', 'topic': 'raspberrypi3', 'QoS': 1}
+# if __name__=='__main__':
+    # iotConfig = {'thingName': 'pi', 'topic': 'raspberrypi3', 'QoS': 1}
     # print(IoTOps(iotConfig=iotConfig).delete_shadow())
-    print(IoTOps(iotConfig=iotConfig).initialize_shadow())
-    print(IoTOps(iotConfig=iotConfig).get_shadow())
+    # print(IoTOps(iotConfig=iotConfig).initialize_shadow())
+    # print(IoTOps(iotConfig=iotConfig).get_shadow())

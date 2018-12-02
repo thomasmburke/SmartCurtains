@@ -120,10 +120,15 @@ class SkillHandler(DynamoOps, IoTOps):
         curtainAction = self.event['request']['intent']['slots']['curtainAction'].get('value')
         specifiedCurtain = self.event['request']['intent']['slots']['specifiedCurtain'].get('value')
         deltaPercentage = self.event['request']['intent']['slots']['deltaPercentage'].get('value')
+        curtainReset = self.event['request']['intent']['slots']['curtainReset'].get('value')
         # Check to see if user supplied curtain command is in valid command list
         if curtainAction in self.skillConfig['slots']['curtainAction']:
             # Valid curtainAction and specifiedCurtain Request
-            if specifiedCurtain in self.skillConfig['slots']['specifiedCurtain']:
+            if curtainReset == 'reset':
+                curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusResetIntentResponse'], curtainAction)
+                curtainAction = 'open' if curtainAction in self.skillConfig['commands']['openCommands'] else 'close'
+                super().reset_shadow(curtainAction=curtainAction)
+            elif specifiedCurtain in self.skillConfig['slots']['specifiedCurtain']:
                 curtainSpeech = 'left and right' if specifiedCurtain == 'both' else specifiedCurtain
                 curtainResponse = self.insert_into_response(self.skillConfig['responses']['validStatusDirectionIntentResponse'], curtainAction, curtainSpeech)
                 curtainAction = 'open' if curtainAction in self.skillConfig['commands']['openCommands'] else 'close'

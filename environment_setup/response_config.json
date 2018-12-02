@@ -45,6 +45,13 @@
                 "cardTitle": "Curtain Adjustment",
                 "endSession": true
             },
+            "validStatusResetIntentResponse": {
+                "outputSpeech": "You have chosen to reset the curtains to {0}",
+                "repromptMessage": "Do you want to adjust the curtain setting again?",
+                "cardText": "You have chosen to reset the curtain to {0}",
+                "cardTitle": "Curtain Reset",
+                "endSession": true
+            },
             "invalidIntentResponse": {
                 "outputSpeech": "{} is a curtain command not supported by the raspberry pi",
                 "repromptMessage": "Do you want to perform an action on the curtains?",
