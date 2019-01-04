@@ -18,7 +18,7 @@ class MotorOps(Adafruit_MotorHAT):
     Params: message DICT - message containing action and curtain it pertains to
 
     """
-    MAX_STEPS = 2000000
+    MAX_STEPS = 2000
 
     def __init__(self, message):
         self.message = message
@@ -42,14 +42,12 @@ class MotorOps(Adafruit_MotorHAT):
             numSteps = int(self.MAX_STEPS * float(self.message['left']['percentage']))
             direction = self.FORWARD if self.message['left']['action'] == 'open' else self.BACKWARD
             logger.info('Left Motor - numSteps={0}, direction={1}'.format(numSteps,direction))
-            leftStepperThread = threading.Thread(target=self.stepper_worker, args=(self.leftStepper, numSteps, direction, self.SINGLE))
-            leftStepperThread.start()
+            self.stepper_worker(self.leftStepper, numSteps, direction, self.SINGLE)
         if 'right' in self.message:
             numSteps = int(self.MAX_STEPS * float(self.message['right']['percentage']))
-            direction = self.FORWARD if self.message['right']['action'] == 'open' else self.BACKWARD
+            direction = self.BACKWARD if self.message['right']['action'] == 'open' else self.FORWARD
             logger.info('Right Motor - numSteps={0}, direction={1}'.format(numSteps,direction))
-            rightStepperThread = threading.Thread(target=self.stepper_worker, args=(self.rightStepper, numSteps, direction, self.SINGLE))
-            rightStepperThread.start()
+            self.stepper_worker(self.rightStepper, numSteps, direction, self.SINGLE)
 
     def turnOffMotors(self):
         """
@@ -60,6 +58,3 @@ class MotorOps(Adafruit_MotorHAT):
 
     def stepper_worker(self, stepper, numsteps, direction, style):
         stepper.step(numsteps, direction, style)
-
-if __name__=='__main__':
-    MotorOps(message={'left': {'percentage':0.5, 'action': 'open'}, 'right': {'percentage':0.5, 'action': 'close'}}).interpret_message()
