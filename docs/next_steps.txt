@@ -1,0 +1,15 @@
+Create CI/CD pipeline on AWS
+- I have created a key pair jenkins.pem in downloads
+- updated access keys for the tomMacbook user
+
+Next Steps:
+
+CloudFormation:
+---------------
+create cloudformation template for ECS and pipeline
+create-stack based on cludformation template
+
+JENKINS Server:
+--------------
+This will be used to build a docker image from a dockerfile and push that image to the AWS ECR registry. Then create a task definition for my container.
+more to come after I create cloudformation templates
