@@ -17,8 +17,7 @@ The end goal is to fully automate the openining and closing of my two living roo
 * 2x Stepper motor - NEMA -17 size - 200 steps/rev (12V 350mA) [$15 each]
 * Adafruit DC & Stepper Motor HAT for raspberry pi [$22.50]
 * Female DC Power adapter - 2.1mm jack to screw terminal block [$8.50]
-* 8 x AA battery holder with 5.5mm/2.1mm plug [$5.95]
-* 8x AA batteries [$2]
+* 12V DC 1000mA regulated switching power adapter [$8.95]
 * 2x Custom 3D Printed motor wall mount [FREE]
 * 2x Custom 3D Printed bearing holders [FREE]
 * 22 AWG wire [$5]
@@ -32,6 +31,6 @@ The end goal is to fully automate the openining and closing of my two living roo
 * 8GB SD card [$10]
 * Official Raspberry Pi 3 Universal Power Supply (5.1V 2.5A) [$16]
 ### Overall Cost
-$174.45 - Clearly well worth it
+$175.45 - Clearly well worth it
 ## Overview of Architecture
 ![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Curtain_Architecture.png)
