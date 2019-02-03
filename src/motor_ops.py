@@ -18,7 +18,7 @@ class MotorOps(Adafruit_MotorHAT):
     Params: message DICT - message containing action and curtain it pertains to
 
     """
-    MAX_STEPS = 2000
+    MAX_STEPS = 3500
 
     def __init__(self, message):
         self.message = message
@@ -29,8 +29,8 @@ class MotorOps(Adafruit_MotorHAT):
         self.leftStepper = super().getStepper(steps=200, num=1)
         # 200 steps/rev, motor port #2
         self.rightStepper = super().getStepper(steps=200, num=2)
-        self.leftStepper.setSpeed(rpm=6000) # rpm
-        self.rightStepper.setSpeed(rpm=6000) # rpm
+        self.leftStepper.setSpeed(rpm=6000000) # rpm
+        self.rightStepper.setSpeed(rpm=6000000) # rpm
 
     def interpret_message(self):
         """
