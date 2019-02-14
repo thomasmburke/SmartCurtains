@@ -35,4 +35,4 @@ $175.45 - Clearly well worth it
 ## Overview of Architecture
 ![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Curtain_Architecture.png)
 ## Curtains in Action!
-![Alt Text](ttps://media.giphy.com/media/9raOj5gOIo9eNTQVNa/giphy.gif)
+![alt text](https://media.giphy.com/media/9raOj5gOIo9eNTQVNa/giphy.gif)
