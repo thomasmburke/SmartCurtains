@@ -34,3 +34,5 @@ The end goal is to fully automate the openining and closing of my two living roo
 $175.45 - Clearly well worth it
 ## Overview of Architecture
 ![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Curtain_Architecture.png)
+## Curtains in Action!
+![Alt Text](ttps://media.giphy.com/media/9raOj5gOIo9eNTQVNa/giphy.gif)
