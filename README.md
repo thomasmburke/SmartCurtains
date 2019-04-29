@@ -1,10 +1,11 @@
-# Smarthome
-Messing around with RaspberryPi and AWS
-
-# Current Project
-Automated Curtains
-## Goal
-The end goal is to fully automate the openining and closing of my two living room curtains using voice commands and amazon alexa
+# SmartCurtains
+Leveraging Alexa and a raspberry pi to automate the opening and closing of my apartment's curtains via voice commands
+## Available Controls
+* Open and Close Commands
+    * Specify curtain by name (default is all curtains)
+    * Specify percentage to move curtain (default is 100%)
+* Reset Commands
+    * Allow to reset a curtains state (shadow) to either the open or close position
 ## Technology Leveraged
 * AWS Alexa
 * AWS Lambda
@@ -28,11 +29,13 @@ The end goal is to fully automate the openining and closing of my two living roo
 * 2x saftey pins 
 * electrical tape
 * screws for mounting
-* 8GB SD card [$10]
+* 8GB SD card [$5]
 * Official Raspberry Pi 3 Universal Power Supply (5.1V 2.5A) [$16]
 ### Overall Cost
-$175.45 - Clearly well worth it
-## Overview of Architecture
+$170.45 - Clearly well worth it
+## Overview of Technology Architecture
 ![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Curtain_Architecture.png)
+## Overview of Application Architecture
+![alt text](https://github.com/thomasmburke/smarthome/blob/master/docs/Smarthome_Application_Architecture.png)
 ## Curtains in Action!
 ![alt text](https://media.giphy.com/media/9raOj5gOIo9eNTQVNa/giphy.gif)
